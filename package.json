@@ -4,7 +4,6 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "date-fns": "^2.1.0",
     "react": "^16.9.0"
   },
   "devDependencies": {},

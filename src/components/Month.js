@@ -1,34 +1,7 @@
 import { compareAsc, format } from 'date-fns';
 import React, { Component } from 'react';
+import CustomDate from '../CustomDate';
 import time from '../helper';
-
-class CustomDate{
-  constructor(date){
-    this.year = date.year;
-    this.month = date.month;
-    this.day = date.day;
-  }
-
-  isBefore(date){
-    const { year, month, day } = date;
-
-    return this.year < year || (year == this.year &&
-      (this.month < month || (month == this.month && this.day < day)))
-  }
-
-  isAfter(date){
-    const { year, month, day } = date;
-
-    return this.year > year || (year == this.year &&
-      (this.month > month || (month == this.month && this.day > day)))
-  }
-
-  isEqualTo(date){
-    const { year, month, day } = date;
-
-    return year == this.year && month == this.month && day == this.day;
-  }
-}
 
 class Month extends Component{
   constructor(props){
@@ -39,12 +12,42 @@ class Month extends Component{
       year: new Date().getFullYear(),
       start: false,
       end: false,
+      dayNames: [],
+      monthNames: []
     }
   }
 
   componentDidMount(){
     let currentDate = new Date("05.8.19 00:00:00 GMT+0300");
-    this.setState({ month: currentDate.getMonth(), year: currentDate.getFullYear() })
+    let dayNames = this.getDayNames();
+    let monthNames = this.getMonthNames();
+    this.setState({ month: currentDate.getMonth(), year: currentDate.getFullYear(), dayNames, monthNames });
+  }
+
+  getDayNames(){
+    // some random Sunday date
+    let date = new Date(1567951846289), days = [];
+
+    for(let i = 0; i < 7; i += 1){
+      days.push(date.toLocaleString('en-us', { weekday: 'short' }));
+      date.setDate(date.getDate() + 1);
+    }
+
+    return days;
+  }
+
+  getMonthNames(){
+    // some random January date
+    let date = new Date(1546874284089), months = [];
+
+    for(let i = 0; i < 12; i++){
+      months.push(date.toLocaleString('en-us', { month: 'long' }));
+      date.setMonth(date.getMonth() + 1);
+    }
+
+    console.log(months)
+
+    return months;
   }
 
   renderDate(date, color){
@@ -141,13 +144,16 @@ class Month extends Component{
 
     let weeks = time.getMonth(year, month);
 
+    let monthName = this.state.monthNames.length > 0 ? this.state.monthNames[month] : "-";
+
     return(
       <div>
         <div>
-          Current: { year }.{ month }
+          Current: { year }.{ month }  { monthName }
         </div>
         <div onClick={() => this.nextMonth()}>Next</div>
         <div onClick={() => this.prevMonth()}>Prev</div>
+
         { this.renderWeeks(weeks) }
       </div>
     )
