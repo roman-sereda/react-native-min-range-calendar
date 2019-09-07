@@ -81,16 +81,28 @@ class Month extends PureComponent{
 
   render(){
     const { start, end, styles } = this.state;
-    const { month, year, maxDate, minDate } = this.props;
+    const { month, year, maxDate, minDate, maxRange } = this.props;
 
-    let maxD = maxDate ? new CustomDate({ year: maxDate.getFullYear(), month: maxDate.getMonth(), day: maxDate.getDate() }) : false;
-    let minD = minDate ? new CustomDate({ year: minDate.getFullYear(), month: minDate.getMonth(), day: minDate.getDate() }) : false;
+    let maxLimit = maxDate ? new CustomDate({ year: maxDate.getFullYear(), month: maxDate.getMonth(), day: maxDate.getDate() }) : false;
+    let minLimit = minDate ? new CustomDate({ year: minDate.getFullYear(), month: minDate.getMonth(), day: minDate.getDate() }) : false;
+
+    if(maxRange){
+      let rLimit = new Date(minDate);
+      rLimit.setDate(minDate.getDate() + maxRange - 1);
+      rLimit = new CustomDate({ year: rLimit.getFullYear(), month: rLimit.getMonth(), day: rLimit.getDate() })
+      if(maxLimit){
+        console.log(maxLimit)
+        maxLimit = maxLimit.isBefore({ year: rLimit.getFullYear(), month: rLimit.getMonth(), day: rLimit.getDate() }) ? maxLimit : rLimit;
+      }else{
+        maxLimit = rLimit;
+      }
+    }
 
     let weeks = time.getMonth(year, month);
 
     // we iterate calendar page, this variables shows if iteration has reached
     // start and end of date range
-    let startReached = false, endReached = false, afterMinDate = minD ? false : true;
+    let startReached = false, endReached = false, beforeMinLimit = minLimit;
     let weeksCount = weeks.length - 1;
     // this is the first date in our calendar page(calendar page could also show
     // some days from previous or next month because we show every week that has
@@ -115,15 +127,15 @@ class Month extends PureComponent{
           if(weekIndex == 0 && day > 7) date = time.subtractMonth(date);
           if(weekIndex == weeksCount && day < 7) date = time.addMonth(date);
 
-          if(!afterMinDate){
-            if(minD.isAfter(date)){
+          if(beforeMinLimit){
+            if(minLimit.isAfter(date)){
               return this.renderDate(date, { unavaliable: true });
             }else{
               afterMinDate = true;
             }
           }
 
-          if(maxD.isBefore(date)){
+          if(maxLimit && maxLimit.isBefore(date)){
             return this.renderDate(date, { unavaliable: true });
           }
 

@@ -11,10 +11,10 @@ export default class extends PureComponent{
     userStyles: {},
     userColors: {},
     fadeDuration: 300,
-    minRange: 1,
-    maxRange: -1,
-    minDate: new Date(2019,8,6),
-    maxDate: new Date(2019,9,3),
+    mode: 'both',
+    maxRange: false,
+    minDate: false,
+    maxDate: false,
   }
 
   constructor(props){
@@ -97,7 +97,7 @@ export default class extends PureComponent{
 
   render(){
     const { monthNames, month, year, styles, colors, fade } = this.state;
-    const { userColors, userStyles, minDate, maxDate } = this.props;
+    const { userColors, userStyles, minDate, maxDate, maxRange } = this.props;
 
     let monthName = monthNames[month] || "-";
 
@@ -132,6 +132,7 @@ export default class extends PureComponent{
               month = {month}
               minDate = {minDate}
               maxDate = {maxDate}
+              maxRange = {maxRange}
             />
           </Animated.View>
         </View>
