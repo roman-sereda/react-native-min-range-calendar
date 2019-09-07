@@ -1,7 +1,71 @@
-import { compareAsc, format } from 'date-fns';
 import React, { Component } from 'react';
+import { View, Text } from 'react-native';
 import CustomDate from '../CustomDate';
 import time from '../helper';
+
+const weekHeight = 30, weekPadding = 7;
+const height = 6 * weekHeight + weekPadding * 5;
+
+let styles = {
+  wrapper: {
+    paddingBottom: 10,
+    paddingTop: 5,
+    paddingLeft: 10,
+    paddingRight: 10,
+  },
+  title: {
+    fontSize: 25,
+    fontWeight: 'bold',
+    color: '#10245c'
+  },
+  topBar: {
+    marginLeft: 10,
+    marginRight: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: 10,
+    paddingBottom: 10,
+  },
+  calendar: {
+    height: height
+  },
+  month: {
+    flexDirection: 'column'
+  },
+  week: {
+    flexDirection: 'row',
+    height: weekHeight,
+    marginBottom: weekPadding,
+  },
+  day: {
+    width: "14.2857142857%",
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  dayText: {
+    color: '#53628c'
+  },
+  selected: {
+    width: weekHeight + weekPadding,
+    height: weekHeight + weekPadding,
+    backgroundColor: '#488eff',
+    borderRadius: (weekHeight + weekPadding) / 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'white',
+  },
+  selectedDay: {
+    borderRadius: 25,
+    color: 'white',
+  },
+  weekend: {
+    color: '#df6565',
+  },
+  rangedDay: {
+    backgroundColor: '#edf4ff',
+  }
+}
 
 class Month extends Component{
   constructor(props){
@@ -22,6 +86,14 @@ class Month extends Component{
     let dayNames = this.getDayNames();
     let monthNames = this.getMonthNames();
     this.setState({ month: currentDate.getMonth(), year: currentDate.getFullYear(), dayNames, monthNames });
+  }
+
+  renderDayNames(){
+    const { dayNames } = this.state;
+
+    return dayNames.map(day => {
+      return <View style = {styles.day}><Text style = {{ color: '#b5b7b9' }}>{ day }</Text></View>
+    })
   }
 
   getDayNames(){
@@ -45,17 +117,27 @@ class Month extends Component{
       date.setMonth(date.getMonth() + 1);
     }
 
-    console.log(months)
-
     return months;
   }
 
-  renderDate(date, color){
-    return <span
-      onClick = {(e) => this.select(date)}
-      style = {{ width: 25, display: "inline-block", backgroundColor: color }}>
-      { date.day }
-    </span>
+  renderDate(date, style){
+
+    const text = <Text onPress = {(e) => this.select(date)} style = {[styles.dayText, date.isMain ? styles.weekend : {}, date.selected ? { color: 'white' } : {}]}>{ date.day }</Text>
+
+    const s = date.selected ?
+      <View>
+        <View style = {[{ position: 'absolute', top: weekPadding / 2, backgroundColor: '#edf4ff', width: '50%', height: weekHeight }, date.left ? { right: '-25%' } : { left: '-25%' }]} />
+        <View style = {styles.selected}>
+          { text }
+        </View>
+      </View>
+      : text;
+
+
+    return <View
+      style = {[styles.day, style]}>
+      { s }
+    </View>
   }
 
   renderWeeks(weeks){
@@ -78,10 +160,10 @@ class Month extends Component{
     if(end && end.isBefore(startDate)) endReached = true;
 
     return weeks.map((week, weekIndex) => {
-      return(<div style = {{ height: 25 }}>{
+      return(<View style = {styles.week}>{
         week.map((day, dayIndex) => {
 
-          let date = { day, month, year };
+          let date = { day, month, year, isMain: dayIndex == 0 };
 
           // check if day is from previous or next month
           if(weekIndex == 0 && day > 7) date = time.subtractMonth(date);
@@ -89,22 +171,25 @@ class Month extends Component{
 
           if(!startReached && start && start.isEqualTo(date)){
             startReached = true;
-            return this.renderDate(date, "red");
+            date.selected = true;
+            date.left = true;
+            return this.renderDate(date, {});
           }
 
           if(!endReached && end && end.isEqualTo(date)){
             endReached = true;
-            return this.renderDate(date, "blue");
+            date.selected = true;
+            return this.renderDate(date, {});
           }
 
           // if start reached but end - no, then this day in range
           if(end !== false && startReached && !endReached){
-            return this.renderDate(date, "green");
+            return this.renderDate(date, styles.rangedDay);
           }
 
-          return this.renderDate(date, "white");
+          return this.renderDate(date, {});
         })
-      }</div>);})
+      }</View>);})
   }
 
   select(date){
@@ -147,15 +232,21 @@ class Month extends Component{
     let monthName = this.state.monthNames.length > 0 ? this.state.monthNames[month] : "-";
 
     return(
-      <div>
-        <div>
-          Current: { year }.{ month }  { monthName }
-        </div>
-        <div onClick={() => this.nextMonth()}>Next</div>
-        <div onClick={() => this.prevMonth()}>Prev</div>
-
-        { this.renderWeeks(weeks) }
-      </div>
+      <View style = {styles.wrapper}>
+        <View style = {styles.topBar}>
+          <Text style = {styles.navigation} onPress={() => this.prevMonth()}>{ "<" }</Text>
+          <Text style = {styles.title}>{ monthName }</Text>
+          <Text style = {styles.navigation} onPress={() => this.nextMonth()}>{ ">" }</Text>
+        </View>
+        <View style = {styles.calendar}>
+          <View style = {styles.week}>
+            { this.renderDayNames() }
+          </View>
+          <View style = {styles.month}>
+            { this.renderWeeks(weeks) }
+          </View>
+        </View>
+      </View>
     )
   }
 }
