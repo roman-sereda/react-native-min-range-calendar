@@ -9,7 +9,12 @@ const height = 6 * weekHeight + weekPadding * 5;
 export default class extends PureComponent{
   static defaultProps = {
     userStyles: {},
-    userColors: {}
+    userColors: {},
+    fadeDuration: 300,
+    minRange: 1,
+    maxRange: -1,
+    minDate: new Date(2019,8,6),
+    maxDate: new Date(2019,9,3),
   }
 
   constructor(props){
@@ -46,9 +51,10 @@ export default class extends PureComponent{
 
   fadeIn(){
     const { fade } = this.state;
+    const { fadeDuration } = this.props;
 
     return new Promise((resolve, reject) => {
-      Animated.timing(this.state.fade, { toValue: 0, duration: 150 })
+      Animated.timing(this.state.fade, { toValue: 0, duration: fadeDuration / 2 })
       .start(() => {
         resolve();
       });
@@ -57,9 +63,10 @@ export default class extends PureComponent{
 
   fadeOut(){
     const { fade } = this.state;
+    const { fadeDuration } = this.props;
 
     return new Promise((resolve, reject) => {
-      Animated.timing(this.state.fade, { toValue: 1, duration: 150 })
+      Animated.timing(this.state.fade, { toValue: 1, duration: fadeDuration / 2 })
       .start(() => {
         resolve();
       });
@@ -90,7 +97,7 @@ export default class extends PureComponent{
 
   render(){
     const { monthNames, month, year, styles, colors, fade } = this.state;
-    const { userColors, userStyles } = this.props;
+    const { userColors, userStyles, minDate, maxDate } = this.props;
 
     let monthName = monthNames[month] || "-";
 
@@ -123,6 +130,8 @@ export default class extends PureComponent{
               userStyles = {userStyles}
               year = {year}
               month = {month}
+              minDate = {minDate}
+              maxDate = {maxDate}
             />
           </Animated.View>
         </View>
@@ -139,6 +148,7 @@ const styleColors = {
   selectedDayBg: '#488eff',
   selectedDay: 'white',
   weekend: '#df6565',
+  unavaliable: '#b5b7b9'
 }
 
 const getStyles = (colors) => ({

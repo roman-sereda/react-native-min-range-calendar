@@ -28,7 +28,8 @@ class Month extends PureComponent{
       style = {[
         styles.dayText,
         params.isMain ? styles.weekend : {},
-        params.isBound ? styles.selectedDayText : {}
+        params.isBound ? styles.selectedDayText : {},
+        params.unavaliable ? styles.unavaliable : {},
       ]}>
         { date.day }
       </Text>;
@@ -55,7 +56,7 @@ class Month extends PureComponent{
         params.range ? { backgroundColor: colors.rangeBg } : {},
         params.range ? styles.rangedDay : {}
       ]}
-      onPress = {(e) => this.select(date)}>
+      onPress = {params.unavaliable ? null : (e) => this.select(date)}>
       { day }
     </TouchableOpacity>
   }
@@ -80,13 +81,16 @@ class Month extends PureComponent{
 
   render(){
     const { start, end, styles } = this.state;
-    const { month, year } = this.props;
+    const { month, year, maxDate, minDate } = this.props;
+
+    let maxD = maxDate ? new CustomDate({ year: maxDate.getFullYear(), month: maxDate.getMonth(), day: maxDate.getDate() }) : false;
+    let minD = minDate ? new CustomDate({ year: minDate.getFullYear(), month: minDate.getMonth(), day: minDate.getDate() }) : false;
 
     let weeks = time.getMonth(year, month);
 
     // we iterate calendar page, this variables shows if iteration has reached
     // start and end of date range
-    let startReached = false, endReached = false;
+    let startReached = false, endReached = false, afterMinDate = minD ? false : true;
     let weeksCount = weeks.length - 1;
     // this is the first date in our calendar page(calendar page could also show
     // some days from previous or next month because we show every week that has
@@ -105,10 +109,23 @@ class Month extends PureComponent{
         week.map((day, dayIndex) => {
 
           let date = { day, month, year };
+          let params = {}
 
           // check if day is from previous or next month
           if(weekIndex == 0 && day > 7) date = time.subtractMonth(date);
           if(weekIndex == weeksCount && day < 7) date = time.addMonth(date);
+
+          if(!afterMinDate){
+            if(minD.isAfter(date)){
+              return this.renderDate(date, { unavaliable: true });
+            }else{
+              afterMinDate = true;
+            }
+          }
+
+          if(maxD.isBefore(date)){
+            return this.renderDate(date, { unavaliable: true });
+          }
 
           if(!startReached && start && start.isEqualTo(date)){
             startReached = true;
@@ -182,6 +199,9 @@ const getStyles = (colors) => ({
     color: colors.weekend,
   },
   rangedDay: {
-    backgroundColor: colors.rangeBg
+    backgroundColor: colors.rangeBg,
+  },
+  unavaliable: {
+    color: colors.unavaliable,
   }
 });
