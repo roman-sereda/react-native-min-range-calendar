@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import Month from './Month';
-import { Text, View } from 'react-native';
+import { Text, View, Animated } from 'react-native';
 import time from './helper';
 
 const weekHeight = 30, weekPadding = 7;
@@ -27,7 +27,8 @@ export default class extends PureComponent{
       dayNames: time.getDayNames(locale),
       monthNames: time.getMonthNames(locale),
       month: new Date().getMonth(),
-      year: new Date().getFullYear()
+      year: new Date().getFullYear(),
+      fade: new Animated.Value(1),
     };
   }
 
@@ -43,27 +44,55 @@ export default class extends PureComponent{
     });
   }
 
-  nextMonth(){
-    const { month, year } = this.state;
+  fadeIn(){
+    const { fade } = this.state;
 
-    let date = time.addMonth({ month, year });
-    this.setState({ month: date.month, year: date.year });
+    return new Promise((resolve, reject) => {
+      Animated.timing(this.state.fade, { toValue: 0, duration: 150 })
+      .start(() => {
+        resolve();
+      });
+    });
+  }
+
+  fadeOut(){
+    const { fade } = this.state;
+
+    return new Promise((resolve, reject) => {
+      Animated.timing(this.state.fade, { toValue: 1, duration: 150 })
+      .start(() => {
+        resolve();
+      });
+    });
+  }
+
+  nextMonth(){
+    const { month, year, fade } = this.state;
+
+    this.fadeIn().then(() => {
+      let date = time.addMonth({ month, year });
+      this.setState({ month: date.month, year: date.year }, () => {
+        this.fadeOut();
+      });
+    })
   }
 
   prevMonth(){
-    const { month, year } = this.state;
+    const { month, year, fade } = this.state;
 
-    let date = time.subtractMonth({ month, year });
-    this.setState({ month: date.month, year: date.year });
+    this.fadeIn().then(() => {
+      let date = time.subtractMonth({ month, year });
+      this.setState({ month: date.month, year: date.year }, () => {
+        this.fadeOut();
+      });
+    })
   }
 
   render(){
-    const { monthNames, month, year, styles, colors } = this.state;
+    const { monthNames, month, year, styles, colors, fade } = this.state;
     const { userColors, userStyles } = this.props;
 
     let monthName = monthNames[month] || "-";
-
-    console.log(colors)
 
     return(
       <View style = {styles.wrapper}>
@@ -73,9 +102,11 @@ export default class extends PureComponent{
             onPress={() => this.prevMonth()}>
             { "<" }
           </Text>
-          <Text style = {styles.title}>
-            { monthName }
-          </Text>
+          <Animated.View style = {{ opacity: fade }}>
+            <Text style = {styles.title}>
+              { monthName }
+            </Text>
+          </Animated.View>
           <Text
             style = {styles.navigation}
             onPress={() => this.nextMonth()}>
@@ -86,12 +117,14 @@ export default class extends PureComponent{
           <View style = {styles.week}>
             { this.renderDayNames() }
           </View>
-          <Month
-            colors = {colors}
-            userStyles = {userStyles}
-            year = {year}
-            month = {month}
-          />
+          <Animated.View style = {{ opacity: fade }}>
+            <Month
+              colors = {colors}
+              userStyles = {userStyles}
+              year = {year}
+              month = {month}
+            />
+          </Animated.View>
         </View>
       </View>
     )
