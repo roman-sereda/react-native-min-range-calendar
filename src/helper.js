@@ -59,3 +59,53 @@ exports.addMonth = (_date) => {
 
   return date;
 }
+
+exports.getDayNames = (locale) => {
+  // some random Sunday date
+  let date = new Date(1567951846289), days = [];
+
+  for(let i = 0; i < 7; i += 1){
+    days.push(date.toLocaleString(locale, { weekday: 'short' }));
+    date.setDate(date.getDate() + 1);
+  }
+
+  return days;
+}
+
+exports.getMonthNames = (locale) => {
+  // some random January date
+  let date = new Date(1546874284089), months = [];
+
+  for(let i = 0; i < 12; i++){
+    months.push(date.toLocaleString(locale, { month: 'long' }));
+    date.setMonth(date.getMonth() + 1);
+  }
+
+  return months;
+}
+
+exports.getColors = (_colors, _newColors) => {
+
+  let colors = _colors;
+
+  Object.keys(_newColors).forEach(key => {
+    if(colors[key]){
+      colors[key] = _newColors[key];
+    }
+  })
+
+  return colors;
+}
+
+exports.getStyles = (_styles, _newStyles, colors) => {
+
+    let styles = _styles(colors);
+
+    Object.keys(_newStyles).forEach(key => {
+      if(styles[key]){
+        styles[key] = _newStyles[key];
+      }
+    })
+
+    return styles;
+  }
