@@ -1,0 +1,24 @@
+{
+  "name": "react-native-min-calendar",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "date-fns": "^2.1.0",
+    "react": "^16.9.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/roman-sereda/react-native-min-range-calendar.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/roman-sereda/react-native-min-range-calendar/issues"
+  },
+  "homepage": "https://github.com/roman-sereda/react-native-min-range-calendar#readme"
+}

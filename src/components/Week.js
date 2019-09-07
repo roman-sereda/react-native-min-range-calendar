@@ -1,15 +1,15 @@
 import { compareAsc, format } from 'date-fns';
 import React, { Component } from 'react';
-import Month from './components/Month';
+import helper from '../helper';
 
-class DDD extends Component{
+class Week extends Component{
     render(){
         return(
             <div>
-              <Month />
+
             </div>
         )
     }
 }
 
-export default DDD;
+export default Week;
