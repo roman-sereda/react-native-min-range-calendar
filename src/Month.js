@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react';
 import { View, Text, TouchableHighlight, TouchableOpacity } from 'react-native';
 import CustomDate from './CustomDate';
+import Days from './Days';
 import time from './helper';
 
 const weekHeight = 30, weekPadding = 7;
@@ -13,6 +14,8 @@ class Month extends PureComponent{
     const { userStyles, colors } = this.props;
     let newStyles = time.getStyles(getStyles, userStyles, colors);
 
+    this.days = new Days(colors, userStyles);
+
     this.state = {
       start: false,
       end: false,
@@ -20,51 +23,11 @@ class Month extends PureComponent{
     }
   }
 
-  renderDate(date, params){
-    const { colors } = this.props;
-    const { start, end, styles } = this.state;
-
-    const text = <Text
-      style = {[
-        styles.dayText,
-        params.isMain ? styles.weekend : {},
-        params.unavaliable ? styles.unavaliable : {},
-        params.isBound ? styles.selectedDayText : {},
-      ]}>
-        { date.day }
-      </Text>;
-
-    const selectedBg = start === false || end === false ?
-      null : <View style = {[
-        styles.selectedBg,
-        params.left ? styles.selectedEndBg : styles.selectedStartBg
-      ]}/> ;
-
-    const day = params.selected ?
-      <View>
-        { selectedBg }
-        <View style = {styles.selected}>
-          { text }
-        </View>
-      </View>
-      : text;
-
-    return <TouchableOpacity
-      underlayColor="white"
-      style = {[
-        styles.day,
-        params.range && !params.selected ? styles.rangedDay : {}
-      ]}
-      onPress = {params.unavaliable ? (e) => this.restore() : (e) => this.select(date)}>
-      { day }
-    </TouchableOpacity>
-  }
-
-  restore(){
+  reset(){
     this.setState({ start: false, end: false})
   }
 
-  select(date, ){
+  select(date){
     const { start, end } = this.state;
 
     let newDate = new CustomDate(date);
@@ -128,49 +91,39 @@ class Month extends PureComponent{
     return weeks.map((week, weekIndex) => {
       return(<View style = {styles.week}>{
         week.map((day, dayIndex) => {
-
           let date = { day, month, year };
-          let params = {}
 
           // check if day is from previous or next month
-          if(weekIndex == 0 && day > 7) date = time.subtractMonth(date);
-          if(weekIndex == weeksCount && day < 7) date = time.addMonth(date);
+          if(weekIndex === 0 && day > 7) date = time.subtractMonth(date);
+          if(weekIndex === weeksCount && day < 7) date = time.addMonth(date);
+
+          let params = { isMain: dayIndex === 0, callback: () => this.select(date) };
 
           if(beforeMinLimit){
             if(minLimit.isAfter(date)){
-              params.unavaliable = true;
+              params = {...params, callback: () => this.reset(), isUnavailable: true };
             }else{
               afterMinDate = true;
             }
           }
 
           if(maxLimit && maxLimit.isBefore(date)){
-            params.unavaliable = true;
+            params = {...params, callback: () => this.reset(), isUnavailable: true };
           }
 
           if(!startReached && start && start.isEqualTo(date)){
-            console.log('ok')
             startReached = true;
-            params.selected = true;
-            params.left = true;
-            params.isBound = true;
+            params = {...params, isSelected: true, selectedBg: start && end ? "start" : "none", };
           }
 
           if(!endReached && end && end.isEqualTo(date)){
             endReached = true;
-            params.selected = true;
-            params.left = false;
-            params.isBound = true;
+            params = {...params, isSelected: true, selectedBg: start && end ? "end" : "none", };
           }
-
           // if start reached but end - no, then this day in range
-          if(end !== false && startReached && !endReached){
-            params.range = true;
-          }
+          if(end !== false && startReached && !endReached) params.inRange = true;
 
-          params.isMain = dayIndex == 0;
-
-          return this.renderDate(date, params);
+          return this.days.getDay(date, params);
         })
       }</View>)
     })
@@ -180,53 +133,9 @@ class Month extends PureComponent{
 export default Month;
 
 const getStyles = (colors) => ({
-  month: {
-    flexDirection: 'column'
-  },
   week: {
     flexDirection: 'row',
     height: weekHeight,
     marginBottom: weekPadding,
   },
-  day: {
-    width: "14.2857142857%",
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  dayText: {
-    color: colors.dayText,
-  },
-  selected: {
-    width: weekHeight + weekPadding,
-    height: weekHeight + weekPadding,
-    backgroundColor: colors.selectedDayBg,
-    borderRadius: (weekHeight + weekPadding) / 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  selectedBg: {
-    position: 'absolute',
-    top: weekPadding / 2,
-    backgroundColor: colors.rangeBg,
-    width: '50%',
-    height: weekHeight
-  },
-  selectedStartBg: {
-    left: '-25%'
-  },
-  selectedEndBg: {
-    right: '-25%'
-  },
-  selectedDayText: {
-    color: colors.selectedDay,
-  },
-  weekend: {
-    color: colors.weekend,
-  },
-  rangedDay: {
-    backgroundColor: colors.rangeBg,
-  },
-  unavaliable: {
-    color: colors.unavaliable,
-  }
 });

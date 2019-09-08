@@ -99,7 +99,7 @@ export default class extends PureComponent{
   render(){
     const { monthNames, month, year, styles, colors, fade } = this.state;
     const { userColors, userStyles, minDate, maxDate, maxRange, minRange } = this.props;
-
+    console.log(month)
     let monthName = monthNames[month] || "-";
 
     return(
