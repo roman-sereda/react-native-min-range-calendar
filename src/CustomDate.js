@@ -1,8 +1,23 @@
-export default class{
+const maxDays = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+const getDaysInMonth = (month, year) => {
+  return year % 4 === 0 && month === 1 ? 28 : maxDays[month];
+}
+
+class CustomDate{
   constructor(date){
-    this.year = date.year;
-    this.month = date.month;
-    this.day = date.day;
+
+    this.set(date);
+  }
+
+  set(date){
+    if(date instanceof Date){
+      this.setFromDate(date);
+    }else{
+      this.year = date.year;
+      this.month = date.month;
+      this.day = date.day;
+    }
   }
 
   isBefore(date){
@@ -24,4 +39,22 @@ export default class{
 
     return year == this.year && month == this.month && day == this.day;
   }
+
+  setFromDate(date){
+    this.year = date.getFullYear();
+    this.month = date.getMonth();
+    this.day = date.getDate();
+  }
+
+  addDays(value){
+    let newDate = new Date(this.year, this.month, this.day);
+    newDate.setDate(newDate.getDate() + value);
+    return new CustomDate(newDate);
+  }
+
+  getDateObject(){
+
+  }
 }
+
+export default CustomDate;

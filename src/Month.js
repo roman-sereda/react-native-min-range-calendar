@@ -49,41 +49,38 @@ class Month extends PureComponent{
     const { start, end, styles } = this.state;
     const { month, year, maxDate, minDate, maxRange, minRange } = this.props;
 
-    let maxLimit = maxDate ? new CustomDate({ year: maxDate.getFullYear(), month: maxDate.getMonth(), day: maxDate.getDate() }) : false;
-    let minLimit = minDate ? new CustomDate({ year: minDate.getFullYear(), month: minDate.getMonth(), day: minDate.getDate() }) : false;
+    // calendar has limits, if date is before minLimit or after maxLimit - it will become unavailable to select
+    // limits calculates from minDate / maxDate or minRange / maxRange (false values == no limits)
+    // if you have chosen start date, then all dates that before start + minRange or after start + maxRange will become
+    // unavailable to select too
+    let maxLimit = maxDate ? new CustomDate(maxDate) : false
+    let minLimit = minDate ? new CustomDate(minDate) : false
 
-    if(minRange && start){
-      let lLimit = new Date(start.year, start.month, start.day);
-      lLimit.setDate(lLimit.getDate() + minRange - 1);
-      lLimit = new CustomDate({ year: lLimit.getFullYear(), month: lLimit.getMonth(), day: lLimit.getDate() })
-      minLimit = lLimit
-    }
+    if(start){
+      if(minRange){
+        minLimit = start.addDays(minRange - 1);
+      }
 
-    if(maxRange && start){
-      let rLimit = new Date(start.year, start.month, start.day);
-      rLimit.setDate(rLimit.getDate() + maxRange - 1);
-      rLimit = new CustomDate({ year: rLimit.getFullYear(), month: rLimit.getMonth(), day: rLimit.getDate() })
-      if(maxLimit){
-        maxLimit = maxLimit.isBefore({ year: rLimit.getFullYear(), month: rLimit.getMonth(), day: rLimit.getDate() }) ? maxLimit : rLimit;
-      }else{
-        maxLimit = rLimit;
+      if(maxRange){
+        let newMaxLimit = start.addDays(maxRange - 1);
+        maxLimit = maxLimit && maxLimit.isBefore(newMaxLimit) ? maxLimit : newMaxLimit;
       }
     }
 
+    // here we get array of weeks with dates of chosen month
     let weeks = time.getMonth(year, month);
-
-    // we iterate calendar page, this variables shows if iteration has reached
-    // start and end of date range
-    let startReached = false, endReached = false, beforeMinLimit = minLimit;
     let weeksCount = weeks.length - 1;
-    // this is the first date in our calendar page(calendar page could also show
-    // some days from previous or next month because we show every week that has
-    // at least one day from choseen month)
+
+    // we iterate calendar page, this variables shows if iteration has reached start and end of selected date range
+    let startReached = false, endReached = false;
+    // just to prevent unnecessary iterations
+    let beforeMinLimit = !!minLimit;
+    // this is the first date in our calendar page(calendar page could also show some days from previous or next month
+    // because we show every week that has at least one day from chosen month)
     let startDate = { day: weeks[0][0], month, year };
     // this is how we check if day from previous month
     if(weeks[0][0] > 7) startDate = time.subtractMonth(startDate)
-
-    // if start and/or end of the range is before start of calendar page then
+    // if `start` and/or `end` of the range is before start of calendar page then
     // we have already reached them
     if(start && start.isBefore(startDate)) startReached = true;
     if(end && end.isBefore(startDate)) endReached = true;
@@ -92,18 +89,18 @@ class Month extends PureComponent{
       return(<View style = {styles.week}>{
         week.map((day, dayIndex) => {
           let date = { day, month, year };
-
           // check if day is from previous or next month
           if(weekIndex === 0 && day > 7) date = time.subtractMonth(date);
           if(weekIndex === weeksCount && day < 7) date = time.addMonth(date);
 
+          // isMain: days that should be marked(by default it is Sundays marked by red color)
           let params = { isMain: dayIndex === 0, callback: () => this.select(date) };
 
           if(beforeMinLimit){
             if(minLimit.isAfter(date)){
               params = {...params, callback: () => this.reset(), isUnavailable: true };
             }else{
-              afterMinDate = true;
+              beforeMinLimit = true;
             }
           }
 
@@ -130,8 +127,6 @@ class Month extends PureComponent{
   }
 }
 
-export default Month;
-
 const getStyles = (colors) => ({
   week: {
     flexDirection: 'row',
@@ -139,3 +134,5 @@ const getStyles = (colors) => ({
     marginBottom: weekPadding,
   },
 });
+
+export default Month;

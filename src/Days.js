@@ -11,7 +11,6 @@ export default class {
   }
 
   getDay(date, params) {
-    console.log(params)
     const { isSelected, isMain, isUnavailable, inRange, callback } = params;
     const { styles } = this;
 
