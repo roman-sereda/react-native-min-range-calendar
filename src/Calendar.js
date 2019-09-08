@@ -12,8 +12,9 @@ export default class extends PureComponent{
     userColors: {},
     fadeDuration: 300,
     mode: 'both',
-    maxRange: false,
-    minDate: false,
+    maxRange: 13,
+    minRange: 5,
+    minDate: new Date(2019, 8, 4),
     maxDate: false,
   }
 
@@ -97,7 +98,7 @@ export default class extends PureComponent{
 
   render(){
     const { monthNames, month, year, styles, colors, fade } = this.state;
-    const { userColors, userStyles, minDate, maxDate, maxRange } = this.props;
+    const { userColors, userStyles, minDate, maxDate, maxRange, minRange } = this.props;
 
     let monthName = monthNames[month] || "-";
 
@@ -133,6 +134,7 @@ export default class extends PureComponent{
               minDate = {minDate}
               maxDate = {maxDate}
               maxRange = {maxRange}
+              minRange = {minRange}
             />
           </Animated.View>
         </View>
@@ -149,7 +151,7 @@ const styleColors = {
   selectedDayBg: '#488eff',
   selectedDay: 'white',
   weekend: '#df6565',
-  unavaliable: '#b5b7b9'
+  unavaliable: '#c6c7c8'
 }
 
 const getStyles = (colors) => ({

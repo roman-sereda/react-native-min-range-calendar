@@ -28,8 +28,8 @@ class Month extends PureComponent{
       style = {[
         styles.dayText,
         params.isMain ? styles.weekend : {},
-        params.isBound ? styles.selectedDayText : {},
         params.unavaliable ? styles.unavaliable : {},
+        params.isBound ? styles.selectedDayText : {},
       ]}>
         { date.day }
       </Text>;
@@ -37,10 +37,10 @@ class Month extends PureComponent{
     const selectedBg = start === false || end === false ?
       null : <View style = {[
         styles.selectedBg,
-        date.left ? styles.selectedEndBg : styles.selectedStartBg
+        params.left ? styles.selectedEndBg : styles.selectedStartBg
       ]}/> ;
 
-    const day = date.selected ?
+    const day = params.selected ?
       <View>
         { selectedBg }
         <View style = {styles.selected}>
@@ -53,15 +53,18 @@ class Month extends PureComponent{
       underlayColor="white"
       style = {[
         styles.day,
-        params.range ? { backgroundColor: colors.rangeBg } : {},
-        params.range ? styles.rangedDay : {}
+        params.range && !params.selected ? styles.rangedDay : {}
       ]}
-      onPress = {params.unavaliable ? null : (e) => this.select(date)}>
+      onPress = {params.unavaliable ? (e) => this.restore() : (e) => this.select(date)}>
       { day }
     </TouchableOpacity>
   }
 
-  select(date){
+  restore(){
+    this.setState({ start: false, end: false})
+  }
+
+  select(date, ){
     const { start, end } = this.state;
 
     let newDate = new CustomDate(date);
@@ -81,17 +84,23 @@ class Month extends PureComponent{
 
   render(){
     const { start, end, styles } = this.state;
-    const { month, year, maxDate, minDate, maxRange } = this.props;
+    const { month, year, maxDate, minDate, maxRange, minRange } = this.props;
 
     let maxLimit = maxDate ? new CustomDate({ year: maxDate.getFullYear(), month: maxDate.getMonth(), day: maxDate.getDate() }) : false;
     let minLimit = minDate ? new CustomDate({ year: minDate.getFullYear(), month: minDate.getMonth(), day: minDate.getDate() }) : false;
 
-    if(maxRange){
-      let rLimit = new Date(minDate);
-      rLimit.setDate(minDate.getDate() + maxRange - 1);
+    if(minRange && start){
+      let lLimit = new Date(start.year, start.month, start.day);
+      lLimit.setDate(lLimit.getDate() + minRange - 1);
+      lLimit = new CustomDate({ year: lLimit.getFullYear(), month: lLimit.getMonth(), day: lLimit.getDate() })
+      minLimit = lLimit
+    }
+
+    if(maxRange && start){
+      let rLimit = new Date(start.year, start.month, start.day);
+      rLimit.setDate(rLimit.getDate() + maxRange - 1);
       rLimit = new CustomDate({ year: rLimit.getFullYear(), month: rLimit.getMonth(), day: rLimit.getDate() })
       if(maxLimit){
-        console.log(maxLimit)
         maxLimit = maxLimit.isBefore({ year: rLimit.getFullYear(), month: rLimit.getMonth(), day: rLimit.getDate() }) ? maxLimit : rLimit;
       }else{
         maxLimit = rLimit;
@@ -129,35 +138,39 @@ class Month extends PureComponent{
 
           if(beforeMinLimit){
             if(minLimit.isAfter(date)){
-              return this.renderDate(date, { unavaliable: true });
+              params.unavaliable = true;
             }else{
               afterMinDate = true;
             }
           }
 
           if(maxLimit && maxLimit.isBefore(date)){
-            return this.renderDate(date, { unavaliable: true });
+            params.unavaliable = true;
           }
 
           if(!startReached && start && start.isEqualTo(date)){
+            console.log('ok')
             startReached = true;
-            date.selected = true;
-            date.left = true;
-            return this.renderDate(date, { isBound: true });
+            params.selected = true;
+            params.left = true;
+            params.isBound = true;
           }
 
           if(!endReached && end && end.isEqualTo(date)){
             endReached = true;
-            date.selected = true;
-            return this.renderDate(date, { isBound: true });
+            params.selected = true;
+            params.left = false;
+            params.isBound = true;
           }
 
           // if start reached but end - no, then this day in range
           if(end !== false && startReached && !endReached){
-            return this.renderDate(date, { range: true, isMain: dayIndex == 0 });
+            params.range = true;
           }
 
-          return this.renderDate(date, { isMain: dayIndex == 0 });
+          params.isMain = dayIndex == 0;
+
+          return this.renderDate(date, params);
         })
       }</View>)
     })
