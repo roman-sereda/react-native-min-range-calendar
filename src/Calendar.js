@@ -98,8 +98,11 @@ export default class extends PureComponent{
 
   render(){
     const { monthNames, month, year, styles, colors, fade } = this.state;
-    const { userColors, userStyles, minDate, maxDate, maxRange, minRange } = this.props;
-    console.log(month)
+    const { userColors, userStyles, minDate, maxDate, maxRange, minRange, mode } = this.props;
+
+    let pickerMode = ['single', 'range', 'both'].indexOf(mode) + 1;
+    if(pickerMode === -1) pickerMode = 2;
+
     let monthName = monthNames[month] || "-";
 
     return(
@@ -130,6 +133,7 @@ export default class extends PureComponent{
               colors = {colors}
               userStyles = {userStyles}
               year = {year}
+              mode = {pickerMode}
               month = {month}
               minDate = {minDate}
               maxDate = {maxDate}

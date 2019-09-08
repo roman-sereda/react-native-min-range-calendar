@@ -3,6 +3,7 @@ import { View, Text, TouchableHighlight, TouchableOpacity } from 'react-native';
 import CustomDate from './CustomDate';
 import Days from './Days';
 import time from './helper';
+import { MODE } from './constants';
 
 const weekHeight = 30, weekPadding = 7;
 const height = 6 * weekHeight + weekPadding * 5;
@@ -29,6 +30,7 @@ class Month extends PureComponent{
 
   select(date){
     const { start, end } = this.state;
+    const { mode } = this.props;
 
     let newDate = new CustomDate(date);
 
@@ -36,9 +38,8 @@ class Month extends PureComponent{
       this.setState({ start: newDate, end: false})
     } else if(start === false){
       this.setState({ start: newDate});
-    // if second selected date if after start then set this date as end,
-    // if not - set selected date as new start
-    }else if(start.isBefore(newDate)){
+    // if second selected date is after `start` then set this date as end, if not - set selected date as new `start`
+    }else if(start.isBefore(newDate) && mode !== MODE.SINGLE){
       this.setState({ end: newDate});
     } else {
       this.setState({ start: newDate, end: false})
@@ -47,16 +48,16 @@ class Month extends PureComponent{
 
   render(){
     const { start, end, styles } = this.state;
-    const { month, year, maxDate, minDate, maxRange, minRange } = this.props;
+    const { month, year, maxDate, minDate, maxRange, minRange, mode } = this.props;
 
     // calendar has limits, if date is before minLimit or after maxLimit - it will become unavailable to select
     // limits calculates from minDate / maxDate or minRange / maxRange (false values == no limits)
     // if you have chosen start date, then all dates that before start + minRange or after start + maxRange will become
     // unavailable to select too
-    let maxLimit = maxDate ? new CustomDate(maxDate) : false
-    let minLimit = minDate ? new CustomDate(minDate) : false
+    let maxLimit = maxDate ? new CustomDate(maxDate) : false;
+    let minLimit = minDate ? new CustomDate(minDate) : false;
 
-    if(start){
+    if(start && mode !== MODE.SINGLE){
       if(minRange){
         minLimit = start.addDays(minRange - 1);
       }
@@ -71,7 +72,7 @@ class Month extends PureComponent{
     let weeks = time.getMonth(year, month);
     let weeksCount = weeks.length - 1;
 
-    // we iterate calendar page, this variables shows if iteration has reached start and end of selected date range
+    // we iterate calendar page, this variables shows if iteration has reached `start` and `end` of selected date range
     let startReached = false, endReached = false;
     // just to prevent unnecessary iterations
     let beforeMinLimit = !!minLimit;
