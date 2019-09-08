@@ -1,5 +1,7 @@
 # react-native-min-range-calendar
 
+## Properties
+---
 | Prop | Type | Default | Desc |
 :------------ |:---------------| :-----| :-----|
 | **`locale`** | `String` | Device language | Calendar localization. If not set the device language will be used. |
@@ -17,3 +19,9 @@
 | **``** | `` | | |
 | **``** | `` | | |
 | **``** | `` | | |
+
+## Styles
+---
+If you want to change only colors of datepicker, you can use userColors property
+
+If you need  to customize styles, you can use userStyles property. UserStyles has higher priority than userColors. 
