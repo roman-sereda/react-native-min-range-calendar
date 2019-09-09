@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react';
 import { View, Text, TouchableHighlight, TouchableOpacity } from 'react-native';
+import dateFormat from 'dateformat'
 import CustomDate from './CustomDate';
 import Days from './Days';
 import time from './helper';
@@ -28,22 +29,45 @@ class Month extends PureComponent{
     this.setState({ start: false, end: false})
   }
 
+  formatDate(date){
+    const { format } = this.props;
+
+    if(date){
+      let newDate = new Date(date.year, date.month, date.day);
+      if(format){
+        return dateFormat(newDate, format)
+      }
+
+      return newDate;
+    }
+
+    return date;
+  }
+
   select(date){
     const { start, end } = this.state;
-    const { mode } = this.props;
+    const { mode, onDateChange } = this.props;
 
-    let newDate = new CustomDate(date);
+    let newDate = new CustomDate(date), newState = {};
 
     if(start !== false && end !== false){
-      this.setState({ start: newDate, end: false})
+      newState = { start: newDate, end: false};
     } else if(start === false){
-      this.setState({ start: newDate});
+      newState = { start: newDate};
     // if second selected date is after `start` then set this date as end, if not - set selected date as new `start`
     }else if(start.isBefore(newDate) && mode !== MODE.SINGLE){
-      this.setState({ end: newDate});
+      newState = { end: newDate};
     } else {
-      this.setState({ start: newDate, end: false})
+      newState = { start: newDate, end: false};
     }
+
+    this.setState(newState, () => {
+      if(MODE === MODE.SINGLE){
+        onDateChange(this.formatDate(start));
+      }else{
+        onDateChange({ start: this.formatDate(this.state.start), end: this.formatDate(this.state.end) });
+      }
+    })
   }
 
   render(){

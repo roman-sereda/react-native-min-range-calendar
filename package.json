@@ -19,5 +19,8 @@
   "bugs": {
     "url": "https://github.com/roman-sereda/react-native-min-range-calendar/issues"
   },
-  "homepage": "https://github.com/roman-sereda/react-native-min-range-calendar#readme"
+  "homepage": "https://github.com/roman-sereda/react-native-min-range-calendar#readme",
+  "dependencies": {
+    "dateformat": "^3.0.3"
+  }
 }

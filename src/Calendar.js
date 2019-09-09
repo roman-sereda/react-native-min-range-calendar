@@ -14,6 +14,7 @@ export default class extends PureComponent{
     mode: 'both',
     maxRange: 13,
     minRange: 5,
+    format: false,
     minDate: new Date(2019, 8, 4),
     maxDate: false,
   }
@@ -30,6 +31,7 @@ export default class extends PureComponent{
       locale: locale,
       styles: newStyles,
       colors: newColors,
+      onDateChange: () => {},
       dayNames: time.getDayNames(locale),
       monthNames: time.getMonthNames(locale),
       month: new Date().getMonth(),
@@ -98,7 +100,7 @@ export default class extends PureComponent{
 
   render(){
     const { monthNames, month, year, styles, colors, fade } = this.state;
-    const { userColors, userStyles, minDate, maxDate, maxRange, minRange, mode } = this.props;
+    const { userColors, userStyles, minDate, maxDate, maxRange, minRange, mode, onDateChange, format } = this.props;
 
     let pickerMode = ['single', 'range', 'both'].indexOf(mode) + 1;
     if(pickerMode === -1) pickerMode = 2;
@@ -133,7 +135,9 @@ export default class extends PureComponent{
               colors = {colors}
               userStyles = {userStyles}
               year = {year}
+              onDateChange = {onDateChange}
               mode = {pickerMode}
+              format = {format}
               month = {month}
               minDate = {minDate}
               maxDate = {maxDate}
