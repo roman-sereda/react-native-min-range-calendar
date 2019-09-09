@@ -1,17 +1,17 @@
 import React from 'react';
 import {Text, TouchableOpacity, View} from 'react-native';
-import time from './helper';
+import helper from './helper';
 
 const weekHeight = 30, weekPadding = 7;
 const height = 6 * weekHeight + weekPadding * 5;
 
 export default class {
   constructor(colors, userStyles) {
-    this.styles = time.getStyles(getStyles, userStyles, colors);
+    this.styles = helper.mergeStyles(getStyles, userStyles, colors);
   }
 
   getDay(date, params) {
-    const { isSelected, isMain, isUnavailable, inRange, callback } = params;
+    const { isSelected, isMain, isUnavailable, inRange, callback, initial } = params;
     const { styles } = this;
 
     let textStyle = {}, wrapperStyle = {};
@@ -21,6 +21,9 @@ export default class {
     if(inRange) textStyle = styles.rangedText
     if(isSelected) textStyle = styles.selectedText;
     if(inRange && !isSelected) wrapperStyle = styles.ranged
+    if(initial && !isSelected && !inRange) wrapperStyle = styles.initialDay;
+
+    if(initial && !isSelected) textStyle = {...textStyle, ...styles.initialDayText };
 
     let day = this.getText(date.day, textStyle);
     if(isSelected) day = this.setSeleceted(day, params.selectedBg);
@@ -47,6 +50,10 @@ export default class {
     );
   }
 
+  getCircle(child, style = {}){
+    return <View style = {[ this.styles.circle, style ]}>{ child }</View>
+  }
+
   setSeleceted(child, selectedBg){
 
     let style = {}, bg = null;
@@ -61,9 +68,7 @@ export default class {
     return(
       <View>
         { bg }
-        <View style = {this.styles.selected}>
-          { child }
-        </View>
+        { this.getCircle(child, this.styles.selected) }
       </View>
     );
   }
@@ -78,7 +83,7 @@ const getStyles = (colors) => ({
   selectedBg: {
     position: 'absolute',
     top: weekPadding / 2,
-    backgroundColor: colors.rangeBg,
+    backgroundColor: colors.range,
     width: '50%',
     height: weekHeight
   },
@@ -88,30 +93,45 @@ const getStyles = (colors) => ({
   selectedStartBg: {
     right: '-25%'
   },
-  selected: {
+  circle: {
     width: weekHeight + weekPadding,
     height: weekHeight + weekPadding,
-    backgroundColor: colors.selectedDayBg,
     borderRadius: (weekHeight + weekPadding) / 2,
     alignItems: 'center',
     justifyContent: 'center',
   },
+  selected: {
+    backgroundColor: colors.selectedDay,
+  },
+  initial: {
+    borderWidth: 0.5,
+    backgroundColor: 'none',
+    borderColor: colors.selectedDay,
+  },
   ranged: {
-    backgroundColor: colors.rangeBg,
+    backgroundColor: colors.range,
   },
   dayText: {
     color: colors.dayText,
   },
   selectedText: {
-    color: colors.selectedDay,
+    color: colors.selectedDayText,
   },
   mainText: {
     color: colors.weekend,
   },
   rangedText: {
-    color: 'green',
+    color: colors.rangeText,
   },
   unavailableText: {
-    color: colors.unavaliable,
+    color: colors.unavailable,
+  },
+  initialDay: {
+    borderBottomColor: colors.initialText,
+    borderBottomWidth: 3,
+  },
+  initialDayText: {
+    borderBottomColor: 'red',
+    borderBottomWidth: 1,
   }
 });

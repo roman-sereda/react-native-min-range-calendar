@@ -6,7 +6,6 @@ const getDaysInMonth = (month, year) => {
 
 class CustomDate{
   constructor(date){
-
     this.set(date);
   }
 
@@ -23,21 +22,21 @@ class CustomDate{
   isBefore(date){
     const { year, month, day } = date;
 
-    return this.year < year || (year == this.year &&
-      (this.month < month || (month == this.month && this.day < day)))
+    return this.year < year || (year === this.year &&
+      (this.month < month || (month === this.month && this.day < day)))
   }
 
   isAfter(date){
     const { year, month, day } = date;
 
-    return this.year > year || (year == this.year &&
-      (this.month > month || (month == this.month && this.day > day)))
+    return this.year > year || (year === this.year &&
+      (this.month > month || (month === this.month && this.day > day)))
   }
 
   isEqualTo(date){
     const { year, month, day } = date;
 
-    return year == this.year && month == this.month && day == this.day;
+    return year === this.year && month === this.month && day === this.day;
   }
 
   setFromDate(date){
@@ -47,13 +46,13 @@ class CustomDate{
   }
 
   addDays(value){
-    let newDate = new Date(this.year, this.month, this.day);
+    let newDate = this.getDateObject();
     newDate.setDate(newDate.getDate() + value);
     return new CustomDate(newDate);
   }
 
   getDateObject(){
-
+    return new Date(this.year, this.month, this.day);
   }
 }
 

@@ -1,41 +1,29 @@
 import React, { PureComponent } from 'react';
+import { Text, View, Animated, TouchableOpacity } from 'react-native';
+import PropTypes from 'prop-types';
+
 import Month from './Month';
-import { Text, View, Animated } from 'react-native';
-import time from './helper';
+import helper from './helper';
 
 const weekHeight = 30, weekPadding = 7;
 const height = 6 * weekHeight + weekPadding * 5;
 
-export default class extends PureComponent{
-  static defaultProps = {
-    userStyles: {},
-    userColors: {},
-    fadeDuration: 300,
-    mode: 'both',
-    maxRange: 13,
-    minRange: 5,
-    format: false,
-    minDate: new Date(2019, 8, 4),
-    maxDate: false,
-  }
-
+class DatePicker extends PureComponent{
   constructor(props){
-    super(props)
+    super(props);
 
-    const { locale, userColors, userStyles } = this.props;
+    const { locale, userColors, userStyles, initialDate } = this.props;
 
-    let newColors = time.getColors(styleColors, userColors);
-    let newStyles = time.getStyles(getStyles, userStyles, newColors);
+    let newColors = helper.mergeColors(userColors);
+    let newStyles = helper.mergeStyles(getStyles, userStyles, newColors);
 
     this.state = {
-      locale: locale,
       styles: newStyles,
       colors: newColors,
-      onDateChange: () => {},
-      dayNames: time.getDayNames(locale),
-      monthNames: time.getMonthNames(locale),
-      month: new Date().getMonth(),
-      year: new Date().getFullYear(),
+      dayNames: helper.getDayNames(locale),
+      monthNames: helper.getMonthNames(locale),
+      month: initialDate.getMonth(),
+      year: initialDate.getFullYear(),
       fade: new Animated.Value(1),
     };
   }
@@ -80,7 +68,7 @@ export default class extends PureComponent{
     const { month, year, fade } = this.state;
 
     this.fadeIn().then(() => {
-      let date = time.addMonth({ month, year });
+      let date = helper.addMonth({ month, year });
       this.setState({ month: date.month, year: date.year }, () => {
         this.fadeOut();
       });
@@ -91,7 +79,7 @@ export default class extends PureComponent{
     const { month, year, fade } = this.state;
 
     this.fadeIn().then(() => {
-      let date = time.subtractMonth({ month, year });
+      let date = helper.subtractMonth({ month, year });
       this.setState({ month: date.month, year: date.year }, () => {
         this.fadeOut();
       });
@@ -100,7 +88,7 @@ export default class extends PureComponent{
 
   render(){
     const { monthNames, month, year, styles, colors, fade } = this.state;
-    const { userColors, userStyles, minDate, maxDate, maxRange, minRange, mode, onDateChange, format } = this.props;
+    const { userColors, userStyles, minDate, maxDate, maxRange, minRange, mode, onDateChange, format, initialDate, leftControl, rightControl } = this.props;
 
     let pickerMode = ['single', 'range', 'both'].indexOf(mode) + 1;
     if(pickerMode === -1) pickerMode = 2;
@@ -110,21 +98,20 @@ export default class extends PureComponent{
     return(
       <View style = {styles.wrapper}>
         <View style = {styles.topBar}>
-          <Text
-            style = {styles.navigation}
-            onPress={() => this.prevMonth()}>
-            { "<" }
-          </Text>
-          <Animated.View style = {{ opacity: fade }}>
+          <TouchableOpacity style = {[ styles.leftControl, styles.controls ]} onPress={() => this.prevMonth()}>
+           { leftControl }
+          </TouchableOpacity>
+          <Animated.View style = {[styles.head, { opacity: fade } ]}>
+            <Text style = {styles.subtitle}>
+              { year }
+            </Text>
             <Text style = {styles.title}>
               { monthName }
             </Text>
           </Animated.View>
-          <Text
-            style = {styles.navigation}
-            onPress={() => this.nextMonth()}>
-            { ">" }
-          </Text>
+          <TouchableOpacity style = {[ styles.rightControl, styles.controls ]} onPress={() => this.nextMonth()}>
+            { rightControl }
+          </TouchableOpacity>
         </View>
         <View style = {styles.calendar}>
           <View style = {styles.week}>
@@ -132,6 +119,7 @@ export default class extends PureComponent{
           </View>
           <Animated.View style = {{ opacity: fade }}>
             <Month
+              initialDate = {initialDate}
               colors = {colors}
               userStyles = {userStyles}
               year = {year}
@@ -151,16 +139,39 @@ export default class extends PureComponent{
   }
 }
 
-const styleColors = {
-  rangeBg: '#edf4ff',
-  dayNames: '#b5b7b9',
-  title: '#10245c',
-  dayText: '#53628c',
-  selectedDayBg: '#488eff',
-  selectedDay: 'white',
-  weekend: '#df6565',
-  unavaliable: '#c6c7c8'
+DatePicker.defaultProps = {
+  locale: 'en',
+  format: false,
+  userColors: {},
+  userStyles: {},
+  fadeDuration: 300,
+  mode: 'both',
+  onDateChange: () => {},
+  maxRange: false,
+  minRange: false,
+  maxDate: false,
+  minDate: false,
+  initialDate: new Date(),
+  leftControl: <Text>{ "<" }</Text>,
+  rightControl: <Text>{ ">" }</Text>,
 }
+
+DatePicker.propTypes = {
+  locale: PropTypes.string,
+  format: PropTypes.oneOfType([ PropTypes.string, PropTypes.oneOf([false]) ]),
+  userColors: PropTypes.object,
+  userStyles: PropTypes.object,
+  fadeDuration: PropTypes.number,
+  mode: PropTypes.oneOf([ 'both', 'single', 'range' ]),
+  onDateChange: PropTypes.func,
+  maxRange: PropTypes.oneOfType([ PropTypes.number, PropTypes.oneOf([false]) ]),
+  minRange: PropTypes.oneOfType([ PropTypes.number, PropTypes.oneOf([false]) ]),
+  maxDate: PropTypes.oneOfType([ PropTypes.instanceOf(Date), PropTypes.oneOf([false]) ]),
+  minDate: PropTypes.oneOfType([ PropTypes.instanceOf(Date), PropTypes.oneOf([false]) ]),
+  initialDate: PropTypes.instanceOf(Date),
+  leftControl: PropTypes.node,
+  rightControl: PropTypes.node,
+};
 
 const getStyles = (colors) => ({
   wrapper: {
@@ -173,8 +184,6 @@ const getStyles = (colors) => ({
     marginLeft: 10,
     marginRight: 10,
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     paddingTop: 10,
     paddingBottom: 10,
   },
@@ -182,6 +191,14 @@ const getStyles = (colors) => ({
     fontSize: 25,
     fontWeight: 'bold',
     color: colors.title
+  },
+  subtitle: {
+    color: colors.subtitle,
+    fontSize: 13,
+  },
+  head: {
+    alignItems: 'center',
+    flexDirection: 'column',
   },
   day: {
     width: "14.2857142857%",
@@ -198,5 +215,21 @@ const getStyles = (colors) => ({
   },
   dayNames: {
     color: colors.dayNames
+  },
+  controls: {
+    flex: 1,
+    justifyContent: 'center'
+  },
+  controlsText: {
+
+  },
+  leftControl: {
+    paddingLeft: 10,
+  },
+  rightControl: {
+    alignItems: 'flex-end',
+    paddingRight: 10,
   }
 });
+
+export default DatePicker;

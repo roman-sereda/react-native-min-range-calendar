@@ -1,3 +1,5 @@
+import styleColors from './colors';
+
 let getMonthSize = (year, month) => (new Date(year, month + 1, 0).getDate())
 let firstDayOfMonth = (year, month) => (new Date(year, month, 1))
 let getNewDate = (date, value) => new Date(new Date(date.getTime()).setDate(value + 1)).getDate()
@@ -5,7 +7,7 @@ let getNewDate = (date, value) => new Date(new Date(date.getTime()).setDate(valu
 // this method returns arrays of integers with dates for calendat page
 // how do we get this?
 // TODO: explain this
-exports.getMonth = (year, month) => {
+const getMonth = (year, month) => {
 
   let monthSize = getMonthSize(year, month);
   let firstDay = firstDayOfMonth(year, month);
@@ -34,7 +36,7 @@ exports.getMonth = (year, month) => {
   return data;
 }
 
-exports.subtractMonth = (_date) => {
+const subtractMonth = (_date) => {
   let date = _date;
 
   date.month--;
@@ -47,7 +49,7 @@ exports.subtractMonth = (_date) => {
   return date;
 }
 
-exports.addMonth = (_date) => {
+addMonth = (_date) => {
   let date = _date;
 
   date.month++;
@@ -60,7 +62,7 @@ exports.addMonth = (_date) => {
   return date;
 }
 
-exports.getDayNames = (locale) => {
+const getDayNames = (locale) => {
   // some random Sunday date
   let date = new Date(1567951846289), days = [];
 
@@ -72,7 +74,7 @@ exports.getDayNames = (locale) => {
   return days;
 }
 
-exports.getMonthNames = (locale) => {
+const getMonthNames = (locale) => {
   // some random January date
   let date = new Date(1546874284089), months = [];
 
@@ -84,9 +86,9 @@ exports.getMonthNames = (locale) => {
   return months;
 }
 
-exports.getColors = (_colors, _newColors) => {
+const mergeColors = (_newColors) => {
 
-  let colors = _colors;
+  let colors = styleColors;
 
   Object.keys(_newColors).forEach(key => {
     if(colors[key]){
@@ -97,7 +99,7 @@ exports.getColors = (_colors, _newColors) => {
   return colors;
 }
 
-exports.getStyles = (_styles, _newStyles, colors) => {
+const mergeStyles = (_styles, _newStyles, colors) => {
 
     let styles = _styles(colors);
 
@@ -108,4 +110,14 @@ exports.getStyles = (_styles, _newStyles, colors) => {
     })
 
     return styles;
+  }
+
+  export default {
+    mergeStyles,
+    mergeColors,
+    getMonthNames,
+    getDayNames,
+    subtractMonth,
+    getMonth,
+    addMonth
   }

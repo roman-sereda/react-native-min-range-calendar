@@ -3,7 +3,7 @@ import { View, Text, TouchableHighlight, TouchableOpacity } from 'react-native';
 import dateFormat from 'dateformat'
 import CustomDate from './CustomDate';
 import Days from './Days';
-import time from './helper';
+import helper from './helper';
 import { MODE } from './constants';
 
 const weekHeight = 30, weekPadding = 7;
@@ -14,7 +14,7 @@ class Month extends PureComponent{
     super(props)
 
     const { userStyles, colors } = this.props;
-    let newStyles = time.getStyles(getStyles, userStyles, colors);
+    let newStyles = helper.mergeStyles(getStyles, userStyles, colors);
 
     this.days = new Days(colors, userStyles);
 
@@ -72,7 +72,7 @@ class Month extends PureComponent{
 
   render(){
     const { start, end, styles } = this.state;
-    const { month, year, maxDate, minDate, maxRange, minRange, mode } = this.props;
+    const { month, year, maxDate, minDate, maxRange, minRange, mode, initialDate } = this.props;
 
     // calendar has limits, if date is before minLimit or after maxLimit - it will become unavailable to select
     // limits calculates from minDate / maxDate or minRange / maxRange (false values == no limits)
@@ -83,7 +83,7 @@ class Month extends PureComponent{
 
     if(start && mode !== MODE.SINGLE){
       if(minRange){
-        minLimit = start.addDays(minRange - 1);
+        minLimit = start.addDays(minRange + 1);
       }
 
       if(maxRange){
@@ -93,8 +93,10 @@ class Month extends PureComponent{
     }
 
     // here we get array of weeks with dates of chosen month
-    let weeks = time.getMonth(year, month);
+    let weeks = helper.getMonth(year, month);
     let weeksCount = weeks.length - 1;
+
+    let initialDay = new CustomDate(initialDate);
 
     // we iterate calendar page, this variables shows if iteration has reached `start` and `end` of selected date range
     let startReached = false, endReached = false;
@@ -104,7 +106,7 @@ class Month extends PureComponent{
     // because we show every week that has at least one day from chosen month)
     let startDate = { day: weeks[0][0], month, year };
     // this is how we check if day from previous month
-    if(weeks[0][0] > 7) startDate = time.subtractMonth(startDate)
+    if(weeks[0][0] > 7) startDate = helper.subtractMonth(startDate)
     // if `start` and/or `end` of the range is before start of calendar page then
     // we have already reached them
     if(start && start.isBefore(startDate)) startReached = true;
@@ -115,8 +117,8 @@ class Month extends PureComponent{
         week.map((day, dayIndex) => {
           let date = { day, month, year };
           // check if day is from previous or next month
-          if(weekIndex === 0 && day > 7) date = time.subtractMonth(date);
-          if(weekIndex === weeksCount && day < 7) date = time.addMonth(date);
+          if(weekIndex === 0 && day > 7) date = helper.subtractMonth(date);
+          if(weekIndex === weeksCount && day < 7) date = helper.addMonth(date);
 
           // isMain: days that should be marked(by default it is Sundays marked by red color)
           let params = { isMain: dayIndex === 0, callback: () => this.select(date) };
@@ -128,6 +130,8 @@ class Month extends PureComponent{
               beforeMinLimit = true;
             }
           }
+
+          if(initialDay.isEqualTo(date)) params.initial = true;
 
           if(maxLimit && maxLimit.isBefore(date)){
             params = {...params, callback: () => this.reset(), isUnavailable: true };
