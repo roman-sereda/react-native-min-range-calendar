@@ -7,9 +7,7 @@ class CustomDate{
     if(date instanceof Date){
       this.setFromDate(date);
     }else{
-      this.year = typeof date.year === "number" ? date.year : new Date().getFullYear();
-      this.month = typeof date.month === "number" ? date.month : new Date().getMonth();
-      this.day = typeof date.day === "number" ? date.day : new Date().getDate();
+      this.setFromProps(date);
     }
   }
 
@@ -37,6 +35,12 @@ class CustomDate{
     this.year = date.getFullYear();
     this.month = date.getMonth();
     this.day = date.getDate();
+  }
+
+  setFromProps(date){
+    this.year = typeof date.year === "number" ? date.year : new Date().getFullYear();
+    this.month = typeof date.month === "number" ? date.month : new Date().getMonth();
+    this.day = typeof date.day === "number" ? date.day : new Date().getDate();
   }
 
   addDays(value){

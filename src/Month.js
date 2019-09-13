@@ -48,16 +48,13 @@ class Month extends PureComponent{
   handleNewSelect(newDate, mode){
     const { start, end } = this.state;
 
-    if(start !== false && end !== false){
-      return { start: newDate, end: false};
-    } else if(start === false){
-      return { start: newDate};
-      // if second selected date is after `start` then set this date as end, if not - set selected date as new `start`
+    if(start !== false){
+      return { end: newDate };
     }else if(start.isBefore(newDate) && mode !== MODE.SINGLE){
-      return { end: newDate};
-    } else {
-      return { start: newDate, end: false};
+      return { end: newDate };
     }
+
+    return { start: newDate, end: false};
   }
 
   select(date){
