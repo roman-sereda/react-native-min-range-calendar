@@ -60,7 +60,7 @@ const addMonth = (_date) => {
   }
 
   return date;
-}
+};
 
 const getDayNames = (locale) => {
   // some random Sunday date
