@@ -28,7 +28,7 @@ describe("'Month' should ", () => {
     it("highlight sundays", () => {
 
         fireEvent.press(getByText("15"));
-        expect(getAllByTestId("selectedLeft").length).toEqual(1);
+        expect(getAllByTestId("selected").length).toEqual(1);
         expect(queryByText("ranged")).toBeNull();
 
         fireEvent.press(getByText("25"));

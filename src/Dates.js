@@ -56,8 +56,6 @@ export default class Dates{
         const { month, year, initialDate } = this.props;
         const { minLimit, maxLimit } = this.calculateBoundaries();
 
-        console.log(maxLimit, minLimit)
-
         this.maxLimit = maxLimit;
         this.minLimit = minLimit;
         // here we get array of weeks with dates of chosen month
@@ -92,7 +90,14 @@ export default class Dates{
 
     chooseType(date, dayIndex){
         const { start, end } = this.state;
-        let params = {}
+        let params = {};
+
+        params = { date, isWeekend: dayIndex === 0 };
+        if(this.initialDay.isEqualTo(date)) params = { date, isInitial: true };
+        if(this.isBeforeMinLimit(date) || this.isAfterMaxLimit(date)){
+            params = { date, isUnavailable: true };
+        }
+        if(end !== false && this.startReached && !this.endReached) params = { date, isRanged: true };
 
         if(!this.startReached && start && start.isEqualTo(date)){
             this.startReached = true;
@@ -103,14 +108,6 @@ export default class Dates{
             this.endReached = true;
             params = { date, isSelected: true, side: 'right', back: start && end };
         }
-
-        if(end !== false && this.startReached && !this.endReached) return { date, isRanged: true };
-        if(this.isBeforeMinLimit(date) || this.isAfterMaxLimit(date)){
-            params = { date, isUnavailable: true };
-        }
-        if(this.initialDay.isEqualTo(date)) return { date, isInitial: true };
-
-        params = { date, isWeekend: dayIndex === 0 };
 
         return params;
     }

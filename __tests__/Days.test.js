@@ -8,7 +8,5 @@ let days = new Days(colors, {});
 describe("'Days' should", () => {
     it("", () => {
 
-        const { debug } = render(days.getDay(1, {callback: () => {}}));
-
     });
 });

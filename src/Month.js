@@ -45,12 +45,10 @@ class Month extends PureComponent{
     return date;
   }
 
-  handleNewSelect(newDate, mode){
+  getNewRangeState(newDate, mode){
     const { start, end } = this.state;
 
-    if(start !== false){
-      return { end: newDate };
-    }else if(start.isBefore(newDate) && mode !== MODE.SINGLE){
+    if(start !== false && end === false && start.isBefore(newDate) && mode !== MODE.SINGLE){
       return { end: newDate };
     }
 
@@ -60,9 +58,7 @@ class Month extends PureComponent{
   select(date){
     const { onDateChange, mode } = this.props;
 
-    console.log(date);
-
-    let newState = this.handleNewSelect(new CustomDate(date), mode);
+    let newState = this.getNewRangeState(new CustomDate(date), mode);
 
     this.setState(newState, () => {
       if(mode === MODE.SINGLE){
