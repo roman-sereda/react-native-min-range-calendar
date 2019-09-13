@@ -27,8 +27,6 @@ describe("DatePicker with default props should", () => {
 
         let month = months[currentMonth];
 
-        debug("");
-
         getByText(month);
     });
 

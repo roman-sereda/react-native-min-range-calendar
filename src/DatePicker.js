@@ -67,13 +67,11 @@ class DatePicker extends Component{
 
   nextMonth(){
     const { month, year, fade } = this.state;
-
     this.switchMonth(helper.addMonth({ month, year }));
   }
 
   prevMonth(){
     const { month, year, fade } = this.state;
-
     this.switchMonth(helper.subtractMonth({ month, year }));
   }
 
