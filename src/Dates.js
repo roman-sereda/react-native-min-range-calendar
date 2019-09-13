@@ -90,26 +90,24 @@ export default class Dates{
 
     chooseType(date, dayIndex){
         const { start, end } = this.state;
-        let params = {};
-
-        params = { date, isWeekend: dayIndex === 0 };
-        if(this.initialDay.isEqualTo(date)) params = { date, isInitial: true };
-        if(this.isBeforeMinLimit(date) || this.isAfterMaxLimit(date)){
-            params = { date, isUnavailable: true };
-        }
-        if(end !== false && this.startReached && !this.endReached) params = { date, isRanged: true };
 
         if(!this.startReached && start && start.isEqualTo(date)){
             this.startReached = true;
-            params = { date, isSelected: true, side: 'left', back: start && end }
+            return { date, isSelected: true, side: 'left', back: start && end }
         }
 
         if(!this.endReached && end && end.isEqualTo(date)){
             this.endReached = true;
-            params = { date, isSelected: true, side: 'right', back: start && end };
+            return { date, isSelected: true, side: 'right', back: start && end };
         }
 
-        return params;
+        if(end !== false && this.startReached && !this.endReached) return { date, isRanged: true };
+        if(this.isBeforeMinLimit(date) || this.isAfterMaxLimit(date)){
+            return { date, isUnavailable: true };
+        }
+        if(this.initialDay.isEqualTo(date)) return { date, isInitial: true };
+
+        return { date, isWeekend: dayIndex === 0 };
     }
 
     getDates(){
