@@ -39,7 +39,6 @@ export default class {
   rangedDay(props){
     let day = this.getText(props.date.day, this.styles.rangedText);
     let params = { date: props.date, key: props.key, testID: 'ranged', style: this.styles.ranged };
-    console.log(params)
     return this.getWrapper(day, params);
   }
 
@@ -80,7 +79,6 @@ export default class {
   }
 
   getWrapper(child, props) {
-    console.log(props)
     return (
       <TouchableOpacity
           underlayColor="white"

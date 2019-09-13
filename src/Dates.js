@@ -27,6 +27,9 @@ export default class Dates{
                 let newMaxLimit = start.addDays(maxRange - 1);
                 maxLimit = maxLimit && maxLimit.isBefore(newMaxLimit) ? maxLimit : newMaxLimit;
             }
+
+            let newMinLimit = start;
+            minLimit = minLimit && minLimit.isAfter(newMinLimit) ? minLimit : newMinLimit;
         }
 
         return { maxLimit, minLimit };
@@ -52,6 +55,8 @@ export default class Dates{
         const { start, end } = this.state;
         const { month, year, initialDate } = this.props;
         const { minLimit, maxLimit } = this.calculateBoundaries();
+
+        console.log(maxLimit, minLimit)
 
         this.maxLimit = maxLimit;
         this.minLimit = minLimit;
@@ -87,24 +92,27 @@ export default class Dates{
 
     chooseType(date, dayIndex){
         const { start, end } = this.state;
+        let params = {}
 
         if(!this.startReached && start && start.isEqualTo(date)){
             this.startReached = true;
-            return { date, isSelected: true, side: 'left', back: start && end }
+            params = { date, isSelected: true, side: 'left', back: start && end }
         }
 
         if(!this.endReached && end && end.isEqualTo(date)){
             this.endReached = true;
-            return { date, isSelected: true, side: 'right', back: start && end };
+            params = { date, isSelected: true, side: 'right', back: start && end };
         }
 
         if(end !== false && this.startReached && !this.endReached) return { date, isRanged: true };
         if(this.isBeforeMinLimit(date) || this.isAfterMaxLimit(date)){
-            return { date, isUnavailable: true };
+            params = { date, isUnavailable: true };
         }
         if(this.initialDay.isEqualTo(date)) return { date, isInitial: true };
 
-        return { date, isWeekend: dayIndex === 0 };
+        params = { date, isWeekend: dayIndex === 0 };
+
+        return params;
     }
 
     getDates(){

@@ -82,10 +82,8 @@ class Month extends PureComponent{
     let dates = new Dates(this.props, this.state);
     let weeks = dates.getDates();
 
-    console.log(weeks)
-
     return weeks.map((week, weekIndex) => {
-      return(<View style = {styles.week} key = {week[0].date.day + 'week'}>{
+      return(<View style = {styles.week} key = {week[0].date.day + ' week' + week[0].date.month}>{
         week.map((props, dayIndex) => {
           props.key = props.date.day + " " + props.date.month;
           return this.days.getDay(props);

@@ -1,8 +1,8 @@
 import styleColors from './colors';
 
-let getMonthSize = (year, month) => (new Date(year, month + 1, 0).getDate())
-let firstDayOfMonth = (year, month) => (new Date(year, month, 1))
-let getNewDate = (date, value) => new Date(new Date(date.getTime()).setDate(value + 1)).getDate()
+let getMonthSize = (year, month) => (new Date(year, month + 1, 0).getDate());
+let firstDayOfMonth = (year, month) => (new Date(year, month, 1));
+let getNewDate = (date, value) => new Date(new Date(date.getTime()).setDate(value + 1)).getDate();
 
 // this method returns arrays of integers with dates for calendat page
 // how do we get this?
@@ -16,25 +16,28 @@ const getMonth = (year, month) => {
 
   let data = [];
 
+  let getDate = (week, index) => {
+    if(index < firstDayWeekIndex){
+      return getNewDate(firstDay, index - firstDayWeekIndex);
+    } else if(index >= monthSize + firstDayWeekIndex){
+      return getNewDate(firstDay, index - firstDayWeekIndex);
+    }
+
+    return index - firstDayWeekIndex + 1;
+  };
+
   for(let week = 0; week < weeksCount; week++){
     data.push([]);
 
     for(let day = 0; day < 7; day++){
 
       let index = week * 7 + day;
-
-      if(index < firstDayWeekIndex){
-        data[week].push(getNewDate(firstDay, index - firstDayWeekIndex));
-      } else if(index >= monthSize + firstDayWeekIndex){
-        data[week].push(getNewDate(firstDay, index - firstDayWeekIndex));
-      }else{
-        data[week].push(index - firstDayWeekIndex + 1)
-      }
+      data[week].push(getDate(week, index));
     }
   }
 
   return data;
-}
+};
 
 const subtractMonth = (_date) => {
   let date = _date;
@@ -47,7 +50,7 @@ const subtractMonth = (_date) => {
   }
 
   return date;
-}
+};
 
 const addMonth = (_date) => {
   let date = _date;
@@ -72,7 +75,7 @@ const getDayNames = (locale) => {
   }
 
   return days;
-}
+};
 
 const getMonthNames = (locale) => {
   // some random January date
@@ -84,7 +87,7 @@ const getMonthNames = (locale) => {
   }
 
   return months;
-}
+};
 
 const mergeColors = (_newColors) => {
 
@@ -94,10 +97,10 @@ const mergeColors = (_newColors) => {
     if(colors[key]){
       colors[key] = _newColors[key];
     }
-  })
+  });
 
   return colors;
-}
+};
 
 const mergeStyles = (_styles, _newStyles, colors) => {
 
@@ -110,7 +113,7 @@ const mergeStyles = (_styles, _newStyles, colors) => {
     });
 
     return styles;
-  }
+  };
 
   export default {
     mergeStyles,
