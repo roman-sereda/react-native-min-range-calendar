@@ -38,8 +38,7 @@ export default class {
 
   rangedDay(props){
     let day = this.getText(props.date.day, this.styles.rangedText);
-    let params = { date: props.date, key: props.key, testID: 'ranged', style: this.styles.ranged };
-    return this.getWrapper(day, params);
+    return this.getWrapper(day, { date: props.date, key: props.key, testID: 'ranged', style: this.styles.ranged });
   }
 
   unAvailableDay(props){
