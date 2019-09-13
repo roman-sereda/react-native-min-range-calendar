@@ -28,16 +28,20 @@ class DatePicker extends Component{
     };
   }
 
-  renderDayNames(){
+  renderDaysOfTheWeek(){
     const { dayNames, styles } = this.state;
 
-    return dayNames.map(day => {
-      return <View style = {styles.day} key = {"name" + day}>
-        <Text style = {styles.dayNames}>
-          { day }
-        </Text>
+    return(
+      <View style = {styles.week}>
+        { dayNames.map(day => {
+          return <View style = {styles.day} key = {"name" + day}>
+            <Text style = {styles.dayNames}>
+             { day }
+            </Text>
+          </View>
+        }) }
       </View>
-    });
+    )
   }
 
   fade(value){
@@ -73,30 +77,22 @@ class DatePicker extends Component{
     this.switchMonth(helper.subtractMonth({ month, year }));
   }
 
-  render(){
-    const { monthNames, month, year, styles, colors, fade } = this.state;
-    const { userColors, userStyles, minDate, maxDate, maxRange, minRange, mode, onDateChange, format, initialDate, leftControl, rightControl } = this.props;
-
-    let pickerMode = ['single', 'range', 'both'].indexOf(mode) + 1;
-    if(pickerMode === -1) pickerMode = 2;
+  renderTopBar(){
+    const { year, month, styles, monthNames, fade } = this.state;
+    const { leftControl, rightControl } = this.props;
 
     let monthName = monthNames[month] || "-";
 
-    return(
-      <View style = {styles.wrapper}>
+    return (
         <View style = {styles.topBar}>
           <TouchableOpacity
               testID="leftController"
               style = {[ styles.leftControl, styles.controls ]} onPress={() => this.prevMonth()}>
-           { leftControl }
+            { leftControl }
           </TouchableOpacity>
           <Animated.View style = {[styles.head, { opacity: fade } ]}>
-            <Text style = {styles.subtitle}>
-              { year }
-            </Text>
-            <Text style = {styles.title}>
-              { monthName }
-            </Text>
+            <Text style = {styles.subtitle}>{ year }</Text>
+            <Text style = {styles.title}>{ monthName }</Text>
           </Animated.View>
           <TouchableOpacity
               testID="rightController"
@@ -104,25 +100,42 @@ class DatePicker extends Component{
             { rightControl }
           </TouchableOpacity>
         </View>
+    )
+  }
+
+  renderCalendar(){
+    const { month, year, colors } = this.state;
+    const { userStyles, minDate, maxDate, maxRange, minRange, mode, onDateChange, format, initialDate } = this.props;
+
+    let pickerMode = ['single', 'range', 'both'].indexOf(mode) + 1;
+    if(pickerMode === -1) pickerMode = 2;
+
+    return(
+      <Month
+        initialDate = {initialDate}
+        colors = {colors}
+        userStyles = {userStyles}
+        year = {year}
+        onDateChange = {onDateChange}
+        mode = {pickerMode}
+        format = {format}
+        month = {month}
+        minDate = {minDate} maxDate = {maxDate}
+        minRange = {minRange} maxRange = {maxRange}
+      />
+    )
+  }
+
+  render(){
+    const { styles, fade } = this.state;
+
+    return(
+      <View style = {styles.wrapper}>
+        { this.renderTopBar() }
         <View style = {styles.calendar}>
-          <View style = {styles.week}>
-            { this.renderDayNames() }
-          </View>
+          { this.renderDaysOfTheWeek() }
           <Animated.View style = {{ opacity: fade }}>
-            <Month
-              initialDate = {initialDate}
-              colors = {colors}
-              userStyles = {userStyles}
-              year = {year}
-              onDateChange = {onDateChange}
-              mode = {pickerMode}
-              format = {format}
-              month = {month}
-              minDate = {minDate}
-              maxDate = {maxDate}
-              maxRange = {maxRange}
-              minRange = {minRange}
-            />
+            { this.renderCalendar() }
           </Animated.View>
         </View>
       </View>

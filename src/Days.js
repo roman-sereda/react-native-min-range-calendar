@@ -11,23 +11,26 @@ export default class {
   }
 
   getDay(date, params) {
-    const { isSelected, isMain, isUnavailable, inRange, callback, initial } = params;
+    const { isSelected, isMain, isUnavailable, inRange, initial } = params;
     const { styles } = this;
 
     let textStyle = {}, wrapperStyle = {};
 
     if(isMain) textStyle = styles.mainText;
     if(isUnavailable) textStyle = styles.unavailableText;
-    if(inRange) textStyle = styles.rangedText
-    if(isSelected) textStyle = styles.selectedText;
-    if(inRange && !isSelected) wrapperStyle = styles.ranged
-    if(initial && !isSelected && !inRange) wrapperStyle = styles.initialDay;
+    if(inRange) textStyle = styles.rangedText;
 
-    if(initial && !isSelected) textStyle = {...textStyle, ...styles.initialDayText };
+    if(isSelected) textStyle = styles.selectedText;
+    else{
+      if(inRange) wrapperStyle = styles.ranged;
+      else if(initial) wrapperStyle = styles.initialDay;
+
+      if(initial) textStyle = {...textStyle, ...styles.initialDayText };
+    }
 
     let day = this.getText(date.day, textStyle);
     if(isSelected) day = this.setSeleceted(day, params.selectedBg);
-    return this.getWrapper(day, wrapperStyle, callback, params.key, params.testID);
+    return this.getWrapper(day, wrapperStyle, params.callback, params.key, params.testID);
   }
 
   getText(day, style = {}) {

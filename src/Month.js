@@ -73,10 +73,10 @@ class Month extends PureComponent{
   calculateLimits(){
     const { start } = this.state;
     const { minRange, maxRange, minDate, maxDate, mode } = this.props;
-    // calendar has limits, if date is before minLimit or after maxLimit - it will become unavailable to select
-    // limits calculates from minDate / maxDate or minRange / maxRange (false values == no limits)
-    // if you have chosen start date, then all dates that before start + minRange or after start + maxRange will become
-    // unavailable to select too
+    /* calendar has limits, if date is before minLimit or after maxLimit - it will become unavailable to select
+       limits calculates from minDate / maxDate or minRange / maxRange (false values == no limits)
+       if you have chosen start date, then all dates that before start + minRange or after start + maxRange will become
+       unavailable to select too */
     let maxLimit = maxDate ? new CustomDate(maxDate) : false;
     let minLimit = minDate ? new CustomDate(minDate) : false;
 
