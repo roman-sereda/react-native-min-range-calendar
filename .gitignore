@@ -21,6 +21,7 @@ DerivedData
 *.xcuserstate
 project.xcworkspace
 
+
 # Gradle
 /build/
 /RNTester/android/app/build/
