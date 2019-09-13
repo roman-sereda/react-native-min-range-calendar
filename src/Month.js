@@ -81,12 +81,7 @@ class Month extends PureComponent{
     let minLimit = minDate ? new CustomDate(minDate) : false;
 
     if(start && mode !== MODE.SINGLE){
-      if(minRange) minLimit = start.addDays(minRange + 1);
-
-      if(maxRange){
-        let newMaxLimit = start.addDays(maxRange - 1);
-        maxLimit = maxLimit && maxLimit.isBefore(newMaxLimit) ? maxLimit : newMaxLimit;
-      }
+      // qwe
     }
 
     return { maxLimit, minLimit };
