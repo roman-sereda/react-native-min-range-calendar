@@ -44,26 +44,29 @@ class Month extends PureComponent{
     return date;
   }
 
-  select(date){
+  handleNewSelect(newDate, mode){
     const { start, end } = this.state;
-    const { mode, onDateChange } = this.props;
-
-    let newDate = new CustomDate(date), newState = {};
 
     if(start !== false && end !== false){
-      newState = { start: newDate, end: false};
+      return { start: newDate, end: false};
     } else if(start === false){
-      newState = { start: newDate};
-    // if second selected date is after `start` then set this date as end, if not - set selected date as new `start`
+      return { start: newDate};
+      // if second selected date is after `start` then set this date as end, if not - set selected date as new `start`
     }else if(start.isBefore(newDate) && mode !== MODE.SINGLE){
-      newState = { end: newDate};
+      return { end: newDate};
     } else {
-      newState = { start: newDate, end: false};
+      return { start: newDate, end: false};
     }
+  }
+
+  select(date){
+    const { onDateChange, mode } = this.props;
+
+    let newState = this.handleNewSelect(new CustomDate(date), mode);
 
     this.setState(newState, () => {
-      if(MODE === MODE.SINGLE){
-        onDateChange(this.formatDate(start));
+      if(mode === MODE.SINGLE){
+        onDateChange(this.formatDate(this.state.start));
       }else{
         onDateChange({ start: this.formatDate(this.state.start), end: this.formatDate(this.state.end) });
       }
@@ -81,7 +84,12 @@ class Month extends PureComponent{
     let minLimit = minDate ? new CustomDate(minDate) : false;
 
     if(start && mode !== MODE.SINGLE){
-      // qwe
+      if(minRange) minLimit = start.addDays(minRange + 1);
+
+      if(maxRange){
+        let newMaxLimit = start.addDays(maxRange - 1);
+        maxLimit = maxLimit && maxLimit.isBefore(newMaxLimit) ? maxLimit : newMaxLimit;
+      }
     }
 
     return { maxLimit, minLimit };
@@ -101,11 +109,9 @@ class Month extends PureComponent{
       if(this.minLimit.isAfter(date)){
         params = {...params, callback: () => this.reset(), isUnavailable: true, testID: 'unavailable' };
       }else{
-        this.beforeMinLimit = true;
+        this.beforeMinLimit = false;
       }
     }
-
-    if(this.initialDay.isEqualTo(date)) params.initial = true;
 
     if(this.maxLimit && this.maxLimit.isBefore(date)){
       params = {...params, callback: () => this.reset(), isUnavailable: true, testID: 'unavailable' };
@@ -114,17 +120,29 @@ class Month extends PureComponent{
     return params;
   }
 
+  isLeft(date) {
+    const { start } = this.state;
+
+    return !this.startReached && start && start.isEqualTo(date);
+  }
+
+  isRight(date) {
+    const { end } = this.state;
+
+    return !this.endReached && end && end.isEqualTo(date);
+  }
+
   checkSelections(date, params){
     const { end, start } = this.state;
     // if start reached but end - no, then this day in range
     if(end !== false && this.startReached && !this.endReached) params = {...params, inRange: true, testID: 'ranged' };
 
-    if(!this.startReached && start && start.isEqualTo(date)){
+    if(this.isLeft(date)){
       this.startReached = true;
       params = {...params, isSelected: true, selectedBg: start && end ? "start" : "none", testID: 'selectedLeft' };
     }
 
-    if(!this.endReached && end && end.isEqualTo(date)){
+    if(this.isRight(date)){
       this.endReached = true;
       params = {...params, isSelected: true, selectedBg: start && end ? "end" : "none", testID: 'selectedRight' };
     }
@@ -145,6 +163,8 @@ class Month extends PureComponent{
           if(weekIndex === this.weeksCount && day < 7) date = helper.addMonth(date);
           // isMain: days that should be marked(by default it is Sundays marked by red color)
           let params = this.getDefaultParams(date, dayIndex);
+
+          if(this.initialDay.isEqualTo(date)) params.initial = true;
 
           params = this.checkOnUnavailability(date, params);
           params = this.checkSelections(date, params);
