@@ -18,14 +18,17 @@ export default class {
 
     if(isMain) textStyle = styles.mainText;
     if(isUnavailable) textStyle = styles.unavailableText;
-    if(inRange) textStyle = styles.rangedText;
 
-    if(isSelected) textStyle = styles.selectedText;
-    else{
-      if(inRange) wrapperStyle = styles.ranged;
-      else if(initial) wrapperStyle = styles.initialDay;
-
-      if(initial) textStyle = {...textStyle, ...styles.initialDayText };
+    if(isSelected){
+      textStyle = styles.selectedText;
+    }else{
+      if(inRange){
+        textStyle = styles.rangedText;
+        wrapperStyle = styles.ranged;
+      }else{
+        wrapperStyle = styles.initialDay;
+        textStyle = {...textStyle, ...styles.initialDayText };
+      }
     }
 
     let day = this.getText(date.day, textStyle);
