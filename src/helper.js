@@ -49,7 +49,7 @@ const subtractMonth = (_date) => {
   return date;
 }
 
-addMonth = (_date) => {
+const addMonth = (_date) => {
   let date = _date;
 
   date.month++;
@@ -105,9 +105,9 @@ const mergeStyles = (_styles, _newStyles, colors) => {
 
     Object.keys(_newStyles).forEach(key => {
       if(styles[key]){
-        styles[key] = _newStyles[key];
+        styles[key] = Object.assign({}, styles[key], _newStyles[key]);
       }
-    })
+    });
 
     return styles;
   }

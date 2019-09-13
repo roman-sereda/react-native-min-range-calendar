@@ -27,7 +27,7 @@ export default class {
 
     let day = this.getText(date.day, textStyle);
     if(isSelected) day = this.setSeleceted(day, params.selectedBg);
-    return this.getWrapper(day, wrapperStyle, callback);
+    return this.getWrapper(day, wrapperStyle, callback, params.key, params.testID);
   }
 
   getText(day, style = {}) {
@@ -38,12 +38,14 @@ export default class {
     );
   }
 
-  getWrapper(child, style = {}, callback) {
+  getWrapper(child, style = {}, callback, key, testID) {
     return (
       <TouchableOpacity
           underlayColor="white"
           style={[ this.styles.day, style ]}
           onPress={callback}
+          testID = {testID}
+          key = {key}
       >
         {child}
       </TouchableOpacity>

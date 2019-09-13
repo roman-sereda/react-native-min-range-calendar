@@ -113,19 +113,23 @@ class Month extends PureComponent{
     if(end && end.isBefore(startDate)) endReached = true;
 
     return weeks.map((week, weekIndex) => {
-      return(<View style = {styles.week}>{
+      return(<View style = {styles.week} key = {week[0] + 'week'}>{
         week.map((day, dayIndex) => {
           let date = { day, month, year };
           // check if day is from previous or next month
           if(weekIndex === 0 && day > 7) date = helper.subtractMonth(date);
           if(weekIndex === weeksCount && day < 7) date = helper.addMonth(date);
-
           // isMain: days that should be marked(by default it is Sundays marked by red color)
-          let params = { isMain: dayIndex === 0, callback: () => this.select(date) };
+          let params = {
+            callback: () => this.select(date),
+            key: "day" + day + "" + month,
+            isMain: dayIndex === 0,
+            testID: dayIndex === 0 ? 'weekend' : 'regular'
+          };
 
           if(beforeMinLimit){
             if(minLimit.isAfter(date)){
-              params = {...params, callback: () => this.reset(), isUnavailable: true };
+              params = {...params, callback: () => this.reset(), isUnavailable: true, testID: 'unavailable' };
             }else{
               beforeMinLimit = true;
             }
@@ -134,20 +138,20 @@ class Month extends PureComponent{
           if(initialDay.isEqualTo(date)) params.initial = true;
 
           if(maxLimit && maxLimit.isBefore(date)){
-            params = {...params, callback: () => this.reset(), isUnavailable: true };
+            params = {...params, callback: () => this.reset(), isUnavailable: true, testID: 'unavailable' };
           }
+          // if start reached but end - no, then this day in range
+          if(end !== false && startReached && !endReached) params = {...params, inRange: true, testID: 'ranged' };
 
           if(!startReached && start && start.isEqualTo(date)){
             startReached = true;
-            params = {...params, isSelected: true, selectedBg: start && end ? "start" : "none", };
+            params = {...params, isSelected: true, selectedBg: start && end ? "start" : "none", testID: 'selectedLeft' };
           }
 
           if(!endReached && end && end.isEqualTo(date)){
             endReached = true;
-            params = {...params, isSelected: true, selectedBg: start && end ? "end" : "none", };
+            params = {...params, isSelected: true, selectedBg: start && end ? "end" : "none", testID: 'selectedRight' };
           }
-          // if start reached but end - no, then this day in range
-          if(end !== false && startReached && !endReached) params.inRange = true;
 
           return this.days.getDay(date, params);
         })

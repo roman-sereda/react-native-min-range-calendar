@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import { Text, View, Animated, TouchableOpacity } from 'react-native';
 import PropTypes from 'prop-types';
 
@@ -8,7 +8,7 @@ import helper from './helper';
 const weekHeight = 30, weekPadding = 7;
 const height = 6 * weekHeight + weekPadding * 5;
 
-class DatePicker extends PureComponent{
+class DatePicker extends Component{
   constructor(props){
     super(props);
 
@@ -32,7 +32,7 @@ class DatePicker extends PureComponent{
     const { dayNames, styles } = this.state;
 
     return dayNames.map(day => {
-      return <View style = {styles.day}>
+      return <View style = {styles.day} key = {"name" + day}>
         <Text style = {styles.dayNames}>
           { day }
         </Text>
@@ -98,7 +98,9 @@ class DatePicker extends PureComponent{
     return(
       <View style = {styles.wrapper}>
         <View style = {styles.topBar}>
-          <TouchableOpacity style = {[ styles.leftControl, styles.controls ]} onPress={() => this.prevMonth()}>
+          <TouchableOpacity
+              testID="leftController"
+              style = {[ styles.leftControl, styles.controls ]} onPress={() => this.prevMonth()}>
            { leftControl }
           </TouchableOpacity>
           <Animated.View style = {[styles.head, { opacity: fade } ]}>
@@ -109,7 +111,9 @@ class DatePicker extends PureComponent{
               { monthName }
             </Text>
           </Animated.View>
-          <TouchableOpacity style = {[ styles.rightControl, styles.controls ]} onPress={() => this.nextMonth()}>
+          <TouchableOpacity
+              testID="rightController"
+              style = {[ styles.rightControl, styles.controls ]} onPress={() => this.nextMonth()}>
             { rightControl }
           </TouchableOpacity>
         </View>
