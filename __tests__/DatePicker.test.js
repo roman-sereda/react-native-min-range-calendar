@@ -35,7 +35,6 @@ describe("DatePicker with default props should", () => {
     });
 
     it("should switch month after pressing next month", async () => {
-        getByText(months[currentMonth]);
 
         fireEvent.press(getByTestId("rightController"));
 
@@ -47,7 +46,6 @@ describe("DatePicker with default props should", () => {
     });
 
     it("should switch month after pressing previous month", async () => {
-        getByText(months[currentMonth]);
 
         fireEvent.press(getByTestId("leftController"));
 

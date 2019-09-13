@@ -40,50 +40,37 @@ class DatePicker extends Component{
     });
   }
 
-  fadeIn(){
+  fade(value){
     const { fade } = this.state;
     const { fadeDuration } = this.props;
 
     return new Promise((resolve, reject) => {
-      Animated.timing(this.state.fade, { toValue: 0, duration: fadeDuration / 2 })
+      Animated.timing(this.state.fade, { toValue: value, duration: fadeDuration / 2 })
       .start(() => {
         resolve();
       });
     });
   }
 
-  fadeOut(){
-    const { fade } = this.state;
-    const { fadeDuration } = this.props;
+  switchMonth(date){
+    this.fade(0).then(() => {
 
-    return new Promise((resolve, reject) => {
-      Animated.timing(this.state.fade, { toValue: 1, duration: fadeDuration / 2 })
-      .start(() => {
-        resolve();
+      this.setState({ month: date.month, year: date.year }, () => {
+        this.fade(1);
       });
-    });
+    })
   }
 
   nextMonth(){
     const { month, year, fade } = this.state;
 
-    this.fadeIn().then(() => {
-      let date = helper.addMonth({ month, year });
-      this.setState({ month: date.month, year: date.year }, () => {
-        this.fadeOut();
-      });
-    })
+    this.switchMonth(helper.addMonth({ month, year }));
   }
 
   prevMonth(){
     const { month, year, fade } = this.state;
 
-    this.fadeIn().then(() => {
-      let date = helper.subtractMonth({ month, year });
-      this.setState({ month: date.month, year: date.year }, () => {
-        this.fadeOut();
-      });
-    })
+    this.switchMonth(helper.subtractMonth({ month, year }));
   }
 
   render(){

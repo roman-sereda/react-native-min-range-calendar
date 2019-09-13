@@ -2,39 +2,31 @@ import CustomDate from '../src/CustomDate';
 
 describe("'CustomDate' should ", () => {
 
+    let compareDates = (date1, date2) => {
+        expect(date1.year).toBe(date2.year);
+        expect(date1.month).toBe(date2.month);
+        expect(date1.day).toBe(date2.day);
+    }
+
     it("initialize from params or Date object", () => {
 
         let date = new CustomDate(new Date());
+        let curTime = new Date();
 
-        expect(date.year).toBe(new Date().getFullYear());
-        expect(date.month).toBe(new Date().getMonth());
-        expect(date.day).toBe(new Date().getDate());
+        compareDates(date, { year: curTime.getFullYear(), month: curTime.getMonth(), day: curTime.getDate() } );
 
         let params = { year: 2018, month: 1, day: 1 };
-
         date = new CustomDate(params);
 
-        expect(date.year).toBe(params.year);
-        expect(date.month).toBe(params.month);
-        expect(date.day).toBe(params.day);
-    })
-
-    it("initialize new Date() if no params set", () => {
-
-        let date = new CustomDate(new Date());
-
-        expect(date.year).toBe(new Date().getFullYear());
-        expect(date.month).toBe(new Date().getMonth());
-        expect(date.day).toBe(new Date().getDate());
+        compareDates(date, params );
     })
 
     it("avoid wrong params", () => {
 
         let date = new CustomDate({year: true, month: '123', day: new Date() });
+        let curDate = new Date();
 
-        expect(date.year).toBe(new Date().getFullYear());
-        expect(date.month).toBe(new Date().getMonth());
-        expect(date.day).toBe(new Date().getDate());
+        compareDates(date, { year: curDate.getFullYear(), month: curDate.getMonth(), day: curDate.getDate() } );
     })
 
     it("be before greater date", () => {
