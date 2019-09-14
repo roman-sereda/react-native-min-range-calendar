@@ -25,7 +25,7 @@ describe("'Month' should ", () => {
         expect(getAllByTestId("weekend").length).toEqual(sundays);
     });
 
-    it("highlight sundays", () => {
+    it("highlight selected dates", () => {
 
         fireEvent.press(getByText("15"));
         expect(getAllByTestId("selected").length).toEqual(1);
@@ -36,4 +36,43 @@ describe("'Month' should ", () => {
         expect(getAllByTestId("selectedRight").length).toEqual(1);
         expect(getAllByTestId("ranged").length).toEqual(9);
     });
+
+    it("remove selected dates if clicked on unavailable date", () => {
+
+        fireEvent.press(getAllByTestId("unavailable")[0]);
+        expect(queryByText("selectedLeft")).toBeNull();
+        expect(queryByText("selectedRight")).toBeNull();
+    });
+});
+
+describe("Ranges should work correctly", () => {
+
+    let { debug, queryByText, getByText, getAllByTestId } = render(
+        <DatePicker
+            initialDate = { new Date(2019,1,1) }
+            minRange = {1}
+            maxRange = {5}
+            minDate = {new Date(2019,1,9)}
+            maxDate = {new Date(2019,1,20)}
+        />
+    );
+
+    fireEvent.press(getByText("10"));
+    fireEvent.press(getByText("17"));
+    expect(queryByText("selectedRight")).toBeNull();
+    expect(queryByText("selectedLeft")).toBeNull();
+
+    fireEvent.press(getByText("10"));
+    fireEvent.press(getByText("12"));
+    expect(getAllByTestId("selectedLeft").length).toEqual(1);
+    expect(getAllByTestId("selectedRight").length).toEqual(1);
+
+    fireEvent.press(getByText("8"));
+    expect(queryByText("selectedRight")).toBeNull();
+    expect(queryByText("selectedLeft")).toBeNull();
+
+    fireEvent.press(getByText("25"));
+    expect(queryByText("selectedRight")).toBeNull();
+    expect(queryByText("selectedLeft")).toBeNull();
+
 });

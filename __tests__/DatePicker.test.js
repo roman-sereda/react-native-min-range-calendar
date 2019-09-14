@@ -84,7 +84,58 @@ describe("DatePicker with specified props should", () => {
         });
 
         getByText(russianMonth[new Date().getMonth()]);
-    })
+    });
+
+    it("have working callback", () => {
+
+        let returned = "";
+
+        const { getByText } = render(<DatePicker
+            nitialDate = {new Date(2018,1,1)}
+            onDateChange = {(data) => { returned = data } }
+        />);
+
+        fireEvent.press(getByText("15"));
+        expect(returned.start instanceof Date).toBe(true);
+
+        fireEvent.press(getByText("25"));
+        expect(returned.start instanceof Date).toBe(true);
+        expect(returned.end instanceof Date).toBe(true);
+    });
+
+    it("have working callback", () => {
+
+        let returned = "";
+
+        const { getByText } = render(<DatePicker
+            initialDate = {new Date(2018,1,1)}
+            format = "mm-dd-yyyy"
+            onDateChange = {(data) => { returned = data } }
+        />);
+
+        fireEvent.press(getByText("15"));
+        expect(returned.start).toBe("02-15-2018");
+
+        fireEvent.press(getByText("25"));
+        expect(returned.start).toBe("02-15-2018");
+        expect(returned.end).toBe("02-25-2018");
+    });
+
+    it("have working callback in single mode", () => {
+
+        let returned = "";
+
+        const { getByText } = render(<DatePicker
+            initialDate = {new Date(2018,1,1)}
+            format = "mm-dd-yyyy"
+            mode = "single"
+            userColors = {{ title: 'red' }}
+            onDateChange = {(data) => { returned = data } }
+        />);
+
+        fireEvent.press(getByText("15"));
+        expect(returned).toBe("02-15-2018");
+    });
 });
 
 

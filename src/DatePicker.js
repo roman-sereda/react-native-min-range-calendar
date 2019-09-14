@@ -79,7 +79,7 @@ class DatePicker extends Component{
     const { year, month, styles, monthNames, fade } = this.state;
     const { leftControl, rightControl } = this.props;
 
-    let monthName = monthNames[month] || "-";
+    let monthName = monthNames[month];
 
     return (
         <View style = {styles.topBar}>
