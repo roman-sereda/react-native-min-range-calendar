@@ -1,8 +1,6 @@
 import React, { PureComponent } from 'react';
-import { View, Text, TouchableHighlight, TouchableOpacity } from 'react-native';
-import dateFormat from 'dateformat'
+import formatDate from '../FormatDate';
 import CustomDate from '../CustomDate';
-import helper from '../helper';
 import { MODE } from '../constants';
 import Days from './Dates';
 
@@ -20,12 +18,13 @@ class DatePicker extends PureComponent{
   }
 
   componentDidUpdate(prevProps){
-    const { userStyles, rowHeight, rowPadding } = this.props;
+    const { userStyles, rowHeight, rowPadding, colors } = this.props;
 
-    if (prevProps.userStyles !== userStyles || prevProps.colors !== userStyles.colors ||
+    if (prevProps.userStyles !== userStyles || prevProps.colors !== colors ||
         prevProps.rowHeight !== rowHeight || prevProps.rowPadding !== rowPadding) {
 
       this.updateDates();
+      this.forceUpdate();
     }
   }
 
@@ -39,12 +38,12 @@ class DatePicker extends PureComponent{
   }
 
   formatDate(date){
-    const { format } = this.props;
+    const { format, locale } = this.props;
 
     if(date){
       let newDate = new Date(date.year, date.month, date.day);
       if(format){
-        return dateFormat(newDate, format)
+        return formatDate(newDate, format, locale);
       }
 
       return newDate;

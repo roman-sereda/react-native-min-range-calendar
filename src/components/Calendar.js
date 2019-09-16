@@ -52,7 +52,7 @@ class Calendar extends PureComponent{
     const { dayNames, styles } = this.state;
 
     return(
-      <View style = {styles.week}>
+      <View style = {styles.weekDays}>
         { dayNames.map(day => {
           return <View style = {styles.day} key = {"name" + day}>
             <Text style = {styles.dayNames}>
@@ -121,7 +121,7 @@ class Calendar extends PureComponent{
     )
   }
 
-  renderDatePicker(newColors){
+  renderDatePicker(){
     const { month, year, colors } = this.state;
     const {
       userStyles, minDate, maxDate, maxRange, minRange, mode, onDateChange, format, initialDate, rowPadding, rowHeight,
@@ -152,9 +152,9 @@ class Calendar extends PureComponent{
 
     return(
       <View style = {styles.wrapper}>
-        { this.renderTopBar(styles) }
+        { this.renderTopBar() }
         <View style = {styles.calendar}>
-          { this.renderDaysOfTheWeek(styles) }
+          { this.renderDaysOfTheWeek() }
           <Animated.View style = {{ opacity: fade }}>
             { this.renderDatePicker() }
           </Animated.View>
@@ -237,10 +237,10 @@ const getStyles = (colors, sizes) => ({
   calendar: {
     height: 6 * sizes.rowHeight + sizes.rowPadding * 5,
   },
-  week: {
+  weekDays: {
     flexDirection: 'row',
-    height: sizes.rowHeight,
-    marginBottom: sizes.rowPadding,
+    height: 30,
+    marginBottom: 7,
   },
   dayNames: {
     color: colors.dayNames

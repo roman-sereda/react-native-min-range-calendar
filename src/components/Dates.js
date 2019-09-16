@@ -9,7 +9,7 @@ export default class {
     this.reset = reset;
   }
 
-  update(userStyles, colors, sizes, rowHeight, rowPadding) {
+  update(userStyles, colors, rowHeight, rowPadding) {
     this.styles = helper.mergeStyles(getStyles, userStyles, colors, { rowHeight, rowPadding });
   }
 

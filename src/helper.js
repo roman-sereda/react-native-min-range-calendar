@@ -1,5 +1,4 @@
-import {colors, MODE} from './constants';
-import CustomDate from "./CustomDate";
+import {colors} from './constants';
 
 let getMonthSize = (year, month) => (new Date(year, month + 1, 0).getDate());
 let firstDayOfMonth = (year, month) => (new Date(year, month, 1));
@@ -85,9 +84,9 @@ const getMonthNames = (locale) => {
   return months;
 };
 
-const mergeColors = (_newColors) => {
+const mergeColors = (_newColors = {}) => {
 
-  let defaultColors = colors;
+  let defaultColors = Object.assign({}, colors);
 
   Object.keys(_newColors).forEach(key => {
     if(defaultColors[key]){
@@ -95,12 +94,12 @@ const mergeColors = (_newColors) => {
     }
   });
 
-  return colors;
+  return defaultColors;
 };
 
-const mergeStyles = (_styles, _newStyles, colors, sizes = {}) => {
+const mergeStyles = (_styles, _newStyles, userColors, sizes = {}) => {
 
-    let styles = _styles(colors, sizes);
+    let styles = _styles(userColors, sizes);
 
     Object.keys(_newStyles).forEach(key => {
       if(styles[key]){
