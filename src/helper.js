@@ -6,30 +6,18 @@ let firstDayOfMonth = (year, month) => (new Date(year, month, 1));
 
 // this method returns arrays of integers with dates for calendar page
 // how do we get this?
-// TODO: explain this
-const getMonth = (year, month) => {
 
-  let prevMonth = { year, month };
-  prevMonth.month--;
-  if(prevMonth.month < 0){
-    prevMonth.month = 11;
-    prevMonth.year = year - 1;
-  }
+
+const getMonth = (year, month) => {
+  let prevMonth = subtractMonth({ year, month });
   prevMonth.size = getMonthSize(prevMonth.year, prevMonth.month);
 
-  let nextMonth = { year, month };
-  nextMonth.month++;
-  if(nextMonth.month > 11){
-    nextMonth.month = 0;
-    nextMonth.year = year + 1;
-  }
+  let nextMonth = addMonth({ year, month });
   nextMonth.size = getMonthSize(nextMonth.year, nextMonth.month);
 
-  let monthSize = getMonthSize(year, month);
-  let firstDay = firstDayOfMonth(year, month);
-  let firstDayWeekIndex = firstDay.getDay();
+  let monthSize = getMonthSize(year, month), data = [];
+  let firstDay = firstDayOfMonth(year, month), firstDayWeekIndex = firstDay.getDay();
   let weeksCount = Math.ceil((monthSize + firstDayWeekIndex) / 7);
-  let data = [];
 
   let getDate = (index) => {
     if(index < firstDayWeekIndex){
@@ -37,19 +25,13 @@ const getMonth = (year, month) => {
     } else if(index >= monthSize + firstDayWeekIndex){
       return { year: nextMonth.year, month: nextMonth.month, day: index - monthSize - firstDayWeekIndex + 1};
     }
-
     return { year, month, day: index - firstDayWeekIndex + 1 };
   };
 
   for(let week = 0; week < weeksCount; week++){
     data.push([]);
-
-    for(let day = 0; day < 7; day++){
-      let index = week * 7 + day;
-      data[week].push(getDate(index));
-    }
+    for(let day = 0; day < 7; day++) data[week].push(getDate(week * 7 + day));
   }
-
   return data;
 };
 
