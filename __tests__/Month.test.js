@@ -1,4 +1,4 @@
-import DatePicker from '../src/DatePicker';
+import Calendar from '../src/components/Calendar';
 import Month from '../src/Month';
 import React from 'react';
 import helper from '../src/helper';
@@ -6,7 +6,7 @@ import { render, fireEvent } from 'react-native-testing-library';
 
 describe("'Month' should ", () => {
 
-    let { debug, queryByText, getByText, getAllByTestId } = render(<DatePicker />);
+    let { debug, queryByText, getByText, getAllByTestId } = render(<Calendar />);
     let weeks = helper.getMonth(new Date().getFullYear(), new Date().getMonth());
 
     /*it("render all dates", () => {
@@ -48,7 +48,7 @@ describe("'Month' should ", () => {
 describe("Ranges should work correctly", () => {
 
     let { debug, queryByText, getByText, getAllByTestId } = render(
-        <DatePicker
+        <Calendar
             initialDate = { new Date(2019,1,1) }
             minRange = {1}
             maxRange = {5}

@@ -1,4 +1,4 @@
-import DatePicker from '../src/DatePicker';
+import Calendar from '../src/components/Calendar';
 import helper from '../src/helper';
 import { render, fireEvent } from 'react-native-testing-library';
 import React from 'react';
@@ -8,9 +8,9 @@ jest.useFakeTimers();
 
 let months = helper.getMonthNames('en');
 
-describe("DatePicker with default props should", () => {
+describe("Calendar with default props should", () => {
 
-    const { debug, update, getByText, getByTestId, queryByText } = render(<DatePicker />);
+    const { debug, update, getByText, getByTestId, queryByText } = render(<Calendar />);
     let currentMonth = new Date().getMonth();
     let currentYear = new Date().getFullYear();
 
@@ -57,24 +57,24 @@ describe("DatePicker with default props should", () => {
     })
 });
 
-describe("DatePicker with specified props should", () => {
+describe("Calendar with specified props should", () => {
 
     it("render specified date", () => {
-        const { getByText } = render(<DatePicker initialDate = { new Date(2018,1,5) } />);
+        const { getByText } = render(<Calendar initialDate = { new Date(2018,1,5) } />);
 
         getByText("2018");
         getByText(months[1]);
     });
 
     it("render specified controllers", () => {
-        const { getByText } = render(<DatePicker leftControl = {<Text>ZZ</Text>} rightControl = {<Text>XX</Text>} />);
+        const { getByText } = render(<Calendar leftControl = {<Text>ZZ</Text>} rightControl = {<Text>XX</Text>} />);
 
         getByText("ZZ");
         getByText("XX");
     });
 
     it("render correct localized date of weeks and month with specified locale", () => {
-        const { getByText } = render(<DatePicker locale = "ru" />);
+        const { getByText } = render(<Calendar locale = "ru" />);
 
         let russianMonth = helper.getMonthNames('ru');
         let russianDaysOfWeek = helper.getDayNames('ru');
@@ -90,7 +90,7 @@ describe("DatePicker with specified props should", () => {
 
         let returned = "";
 
-        const { getByText } = render(<DatePicker
+        const { getByText } = render(<Calendar
             nitialDate = {new Date(2018,1,1)}
             onDateChange = {(data) => { returned = data } }
         />);
@@ -107,7 +107,7 @@ describe("DatePicker with specified props should", () => {
 
         let returned = "";
 
-        const { getByText } = render(<DatePicker
+        const { getByText } = render(<Calendar
             initialDate = {new Date(2018,1,1)}
             format = "mm-dd-yyyy"
             onDateChange = {(data) => { returned = data } }
@@ -125,7 +125,7 @@ describe("DatePicker with specified props should", () => {
 
         let returned = "";
 
-        const { getByText } = render(<DatePicker
+        const { getByText } = render(<Calendar
             initialDate = {new Date(2018,1,1)}
             format = "mm-dd-yyyy"
             mode = "single"

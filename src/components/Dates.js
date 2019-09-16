@@ -1,15 +1,21 @@
 import React from 'react';
 import {Text, TouchableOpacity, View} from 'react-native';
-import helper from './helper';
+import helper from '../helper';
+import CustomDate from "../CustomDate";
+import {MODE} from "../constants";
+import DatesManager from '../DatesManager';
 
 const weekHeight = 30, weekPadding = 7;
 const height = 6 * weekHeight + weekPadding * 5;
 
 export default class {
-  constructor(colors, userStyles, select, reset) {
-    this.styles = helper.mergeStyles(getStyles, userStyles, colors);
+  constructor(select, reset) {
     this.select = select;
     this.reset = reset;
+  }
+
+  update(userStyles, colors, sizes) {
+    this.styles = helper.mergeStyles(getStyles, userStyles, colors, sizes);
   }
 
   selectedDay(props){
@@ -60,7 +66,6 @@ export default class {
   }
 
   getDay(props) {
-
     if(props.isSelected) return this.selectedDay(props);
     if(props.isRanged) return this.rangedDay(props);
     if(props.isUnavailable) return this.unAvailableDay(props);
@@ -93,6 +98,21 @@ export default class {
 
   getCircle(child, style = {}){
     return <View style = {[ this.styles.circle, style ]}>{ child }</View>
+  }
+
+  getDates(props){
+    let datesManager = new DatesManager(props);
+
+    return datesManager.weeks.map((week, weekIndex) => {
+      return(<View style = {this.styles.week} key = {week[0].day + ' week' + week[0].month}>{
+        week.map((date, dayIndex) => {
+          let params = datesManager.chooseType(date, dayIndex);
+          params.key = date.day + " " + date.month;
+          params.date = date;
+          return this.getDay(params);
+        })
+      }</View>)
+    });
   }
 }
 
@@ -155,5 +175,10 @@ const getStyles = (colors) => ({
   initialDayText: {
     borderBottomColor: 'red',
     borderBottomWidth: 1,
-  }
+  },
+  week: {
+    flexDirection: 'row',
+    height: weekHeight,
+    marginBottom: weekPadding,
+  },
 });

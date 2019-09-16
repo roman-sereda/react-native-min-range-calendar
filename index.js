@@ -1,2 +1,2 @@
-import DatePicker from './src/DatePicker';
-export default DatePicker;
+import Calendar from './src/components/Calendar';
+export default Calendar;

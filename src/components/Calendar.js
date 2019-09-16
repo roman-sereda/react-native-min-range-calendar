@@ -1,31 +1,54 @@
-import React, { Component } from 'react';
+import React, { PureComponent, Component } from 'react';
 import { Text, View, Animated, TouchableOpacity } from 'react-native';
 import PropTypes from 'prop-types';
 
-import Month from './Month';
-import helper from './helper';
+import DatePicker from './DatePicker';
+import helper from '../helper';
 
 const weekHeight = 30, weekPadding = 7;
 const height = 6 * weekHeight + weekPadding * 5;
 
-class DatePicker extends Component{
+class Calendar extends PureComponent{
   constructor(props){
     super(props);
 
-    const { locale, userColors, userStyles, initialDate } = this.props;
-
-    let newColors = helper.mergeColors(userColors);
-    let newStyles = helper.mergeStyles(getStyles, userStyles, newColors);
+    let newState = this.update();
 
     this.state = {
-      styles: newStyles,
-      colors: newColors,
-      dayNames: helper.getDayNames(locale),
-      monthNames: helper.getMonthNames(locale),
-      month: initialDate.getMonth(),
-      year: initialDate.getFullYear(),
+      ...newState,
       fade: new Animated.Value(1),
     };
+  }
+
+  componentDidUpdate(prevProps, prevState){
+    let newState = this.update(prevProps);
+    if(Object.keys(newState).length > 0) this.setState(newState);
+  }
+
+  // just a little trick to update locales and initialDate only when  props has changed
+  update(prevProps = {}){
+    const { locale, initialDate, userColors, userStyles } = this.props;
+    let newState = {};
+
+    if(prevProps.userColors !== this.props.userColors || prevProps.userStyles !== this.props.userStyles ||
+        prevProps.rawHeight !== this.props.rawHeight || prevProps.rawPadding !== this.props.rawPadding) {
+      let colors = helper.mergeColors(userColors);
+      let sizes = { rawHeight: this.props.rawHeight, rawPadding: this.props.rawPadding };
+      let styles = helper.mergeStyles(getStyles, userStyles, colors, sizes);
+      newState = { styles, colors }
+    }
+
+    if(!prevProps.initialDate || (prevProps.initialDate.getTime() !== this.props.initialDate.getTime())){
+      newState.month = initialDate.getMonth();
+      newState.year = initialDate.getFullYear();
+    }
+
+    if(prevProps.locale !== this.props.locale){
+      newState.dayNames = helper.getDayNames(locale);
+      newState.monthNames = helper.getMonthNames(locale);
+    }
+
+    return newState;
   }
 
   renderDaysOfTheWeek(){
@@ -76,7 +99,7 @@ class DatePicker extends Component{
   }
 
   renderTopBar(){
-    const { year, month, styles, monthNames, fade } = this.state;
+    const { year, month, monthNames, fade, styles } = this.state;
     const { leftControl, rightControl } = this.props;
 
     let monthName = monthNames[month];
@@ -101,7 +124,7 @@ class DatePicker extends Component{
     )
   }
 
-  renderCalendar(){
+  renderDatePicker(newColors){
     const { month, year, colors } = this.state;
     const { userStyles, minDate, maxDate, maxRange, minRange, mode, onDateChange, format, initialDate } = this.props;
 
@@ -109,7 +132,7 @@ class DatePicker extends Component{
     if(pickerMode === -1) pickerMode = 2;
 
     return(
-      <Month
+      <DatePicker
         initialDate = {initialDate}
         colors = {colors}
         userStyles = {userStyles}
@@ -125,15 +148,17 @@ class DatePicker extends Component{
   }
 
   render(){
-    const { styles, fade } = this.state;
+    const { fade, styles } = this.state;
+
+    console.log('RERENDER')
 
     return(
       <View style = {styles.wrapper}>
-        { this.renderTopBar() }
+        { this.renderTopBar(styles) }
         <View style = {styles.calendar}>
-          { this.renderDaysOfTheWeek() }
+          { this.renderDaysOfTheWeek(styles) }
           <Animated.View style = {{ opacity: fade }}>
-            { this.renderCalendar() }
+            { this.renderDatePicker() }
           </Animated.View>
         </View>
       </View>
@@ -141,7 +166,7 @@ class DatePicker extends Component{
   }
 }
 
-DatePicker.defaultProps = {
+Calendar.defaultProps = {
   locale: 'en',
   format: false,
   userColors: {},
@@ -156,9 +181,11 @@ DatePicker.defaultProps = {
   initialDate: new Date(),
   leftControl: <Text>{ "<" }</Text>,
   rightControl: <Text>{ ">" }</Text>,
-}
+  rawHeight: 30,
+  rawPadding: 7,
+};
 
-DatePicker.propTypes = {
+Calendar.propTypes = {
   locale: PropTypes.string,
   format: PropTypes.oneOfType([ PropTypes.string, PropTypes.oneOf([false]) ]),
   userColors: PropTypes.object,
@@ -173,9 +200,11 @@ DatePicker.propTypes = {
   initialDate: PropTypes.instanceOf(Date),
   leftControl: PropTypes.node,
   rightControl: PropTypes.node,
+  rawHeight: PropTypes.number,
+  rawPadding: PropTypes.number,
 };
 
-const getStyles = (colors) => ({
+const getStyles = (colors, sizes) => ({
   wrapper: {
     paddingBottom: 10,
     paddingTop: 5,
@@ -208,12 +237,12 @@ const getStyles = (colors) => ({
     justifyContent: 'center',
   },
   calendar: {
-    height: height,
+    height: 6 * sizes.rawHeight + sizes.rawPadding * 5,
   },
   week: {
     flexDirection: 'row',
-    height: weekHeight,
-    marginBottom: weekPadding,
+    height: sizes.rawHeight,
+    marginBottom: sizes.rawPadding,
   },
   dayNames: {
     color: colors.dayNames
@@ -234,4 +263,4 @@ const getStyles = (colors) => ({
   }
 });
 
-export default DatePicker;
+export default Calendar;

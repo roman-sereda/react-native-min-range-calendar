@@ -1,38 +1,52 @@
-import styleColors from './colors';
+import {colors, MODE} from './constants';
+import CustomDate from "./CustomDate";
 
 let getMonthSize = (year, month) => (new Date(year, month + 1, 0).getDate());
 let firstDayOfMonth = (year, month) => (new Date(year, month, 1));
-let getNewDate = (date, value) => new Date(new Date(date.getTime()).setDate(value + 1)).getDate();
 
 // this method returns arrays of integers with dates for calendat page
 // how do we get this?
 // TODO: explain this
 const getMonth = (year, month) => {
 
+  let prevMonth = { year, month };
+  prevMonth.month--;
+  if(prevMonth.month < 0){
+    prevMonth.month = 11;
+    prevMonth.year = year - 1;
+  }
+  prevMonth.size = getMonthSize(prevMonth.year, prevMonth.month);
+
+  let nextMonth = { year, month };
+  nextMonth.month++;
+  if(nextMonth.month > 11){
+    nextMonth.month = 0;
+    nextMonth.year = year + 1;
+  }
+  nextMonth.size = getMonthSize(nextMonth.year, nextMonth.month);
+
   let monthSize = getMonthSize(year, month);
   let firstDay = firstDayOfMonth(year, month);
   let firstDayWeekIndex = firstDay.getDay();
   let weeksCount = Math.ceil((monthSize + firstDayWeekIndex) / 7);
-
   let data = [];
 
-  let getDate = (week, index) => {
+  let getDate = (index) => {
     if(index < firstDayWeekIndex){
-      return getNewDate(firstDay, index - firstDayWeekIndex);
+      return { year: prevMonth.year, month: prevMonth.month, day: prevMonth.size - (firstDayWeekIndex - index) + 1};
     } else if(index >= monthSize + firstDayWeekIndex){
-      return getNewDate(firstDay, index - firstDayWeekIndex);
+      return { year: nextMonth.year, month: nextMonth.month, day: index - monthSize - firstDayWeekIndex + 1};
     }
 
-    return index - firstDayWeekIndex + 1;
+    return { year, month, day: index - firstDayWeekIndex + 1 };
   };
 
   for(let week = 0; week < weeksCount; week++){
     data.push([]);
 
     for(let day = 0; day < 7; day++){
-
       let index = week * 7 + day;
-      data[week].push(getDate(week, index));
+      data[week].push(getDate(index));
     }
   }
 
@@ -91,20 +105,20 @@ const getMonthNames = (locale) => {
 
 const mergeColors = (_newColors) => {
 
-  let colors = styleColors;
+  let defaultColors = colors;
 
   Object.keys(_newColors).forEach(key => {
-    if(colors[key]){
-      colors[key] = _newColors[key];
+    if(defaultColors[key]){
+      defaultColors[key] = _newColors[key];
     }
   });
 
   return colors;
 };
 
-const mergeStyles = (_styles, _newStyles, colors) => {
+const mergeStyles = (_styles, _newStyles, colors, sizes = {}) => {
 
-    let styles = _styles(colors);
+    let styles = _styles(colors, sizes);
 
     Object.keys(_newStyles).forEach(key => {
       if(styles[key]){
