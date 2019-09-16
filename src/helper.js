@@ -4,7 +4,7 @@ import CustomDate from "./CustomDate";
 let getMonthSize = (year, month) => (new Date(year, month + 1, 0).getDate());
 let firstDayOfMonth = (year, month) => (new Date(year, month, 1));
 
-// this method returns arrays of integers with dates for calendat page
+// this method returns arrays of integers with dates for calendar page
 // how do we get this?
 // TODO: explain this
 const getMonth = (year, month) => {

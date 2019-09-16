@@ -1,141 +1,119 @@
 import Calendar from '../src/components/Calendar';
+import DatePicker from '../src/components/DatePicker';
+import React from 'react';
 import helper from '../src/helper';
 import { render, fireEvent } from 'react-native-testing-library';
-import React from 'react';
-import { Text } from 'react-native';
 
 jest.useFakeTimers();
 
-let months = helper.getMonthNames('en');
+describe("'DatePicker' should ", () => {
 
-describe("Calendar with default props should", () => {
+    const leftController = () => (queryByText("selectedRight"));
+    const rightController = () => (queryByText("selectedRight"));
+    const date = (num) => (getByText(num));
+    const randomUnavailable = () => (getAllByTestId('unavailable')[0]);
+    const all = (testID) => (getAllByTestId(testID));
+    const isNull = (testID) => (queryByText(testID));
 
-    const { debug, update, getByText, getByTestId, queryByText } = render(<Calendar />);
-    let currentMonth = new Date().getMonth();
-    let currentYear = new Date().getFullYear();
+    let { debug, queryByText, getByText, getAllByTestId, getByTestId } = render(<Calendar />);
+    let weeks = helper.getMonth(new Date().getFullYear(), new Date().getMonth());
 
-    it("render days of the week", () => {
-
-        let days = helper.getDayNames('en');
-
-        days.forEach(day => {
-            getByText(day);
-        });
+    it("highlight sundays", () => {
+        let sundays = weeks.length;
+        expect(getAllByTestId("weekend").length).toEqual(sundays);
     });
 
-    it("render month name", () => {
+    it("highlight selected dates and range between them", () => {
 
-        let month = months[currentMonth];
+        fireEvent.press(date("15"));
+        expect(all("selected").length).toEqual(1);
+        expect(isNull("ranged")).toBeNull();
 
-        getByText(month);
+        fireEvent.press(date("25"));
+        leftController();
+        rightController();
+        expect(all("ranged").length).toEqual(9);
     });
 
-    it("render year", () => {
-        getByText(currentYear.toString());
+    it("remove selected dates if clicked on unavailable date", () => {
+        fireEvent.press(date("14"));
+        fireEvent.press(randomUnavailable());
+
+        expect(leftController()).toBeNull();
+        expect(rightController()).toBeNull();
     });
 
-    it("switch month after pressing next month", async () => {
-
+    it("not show leftSelect when switch to next month", () => {
+        fireEvent.press(date("15"));
         fireEvent.press(getByTestId("rightController"));
-
         jest.runAllTimers();
 
-        expect(queryByText(months[currentMonth])).toBeNull();
-        currentMonth = currentMonth === 11 ? 0 : currentMonth + 1;
-        getByText(months[currentMonth]);
-    });
+        fireEvent.press(date("15"));
 
-    it("switch month after pressing previous month", async () => {
+        expect(leftController()).toBeNull();
+        rightController();
+    })
+
+    it("not show rightSelect when switch to prev month", () => {
+        fireEvent.press(date("15"));
+        fireEvent.press(getByTestId("rightController"));
+        jest.runAllTimers();
+
+        fireEvent.press(date("15"));
 
         fireEvent.press(getByTestId("leftController"));
-
         jest.runAllTimers();
 
-        expect(queryByText(months[currentMonth])).toBeNull();
-        currentMonth = currentMonth === 0 ? 11 : currentMonth - 1;
-        getByText(months[currentMonth]);
-    })
-});
-
-describe("Calendar with specified props should", () => {
-
-    it("render specified date", () => {
-        const { getByText } = render(<Calendar initialDate = { new Date(2018,1,5) } />);
-
-        getByText("2018");
-        getByText(months[1]);
+        expect(rightController()).toBeNull();
+        leftController();
     });
 
-    it("render specified controllers", () => {
-        const { getByText } = render(<Calendar leftControl = {<Text>ZZ</Text>} rightControl = {<Text>XX</Text>} />);
+    it("not show any selectors on next month", () => {
+        fireEvent.press(date("15"));
+        fireEvent.press(date("25"));
 
-        getByText("ZZ");
-        getByText("XX");
-    });
+        fireEvent.press(getByTestId("rightController"));
+        jest.runAllTimers();
 
-    it("render correct localized date of weeks and month with specified locale", () => {
-        const { getByText } = render(<Calendar locale = "ru" />);
-
-        let russianMonth = helper.getMonthNames('ru');
-        let russianDaysOfWeek = helper.getDayNames('ru');
-
-        russianDaysOfWeek.forEach(day => {
-            getByText(day);
-        });
-
-        getByText(russianMonth[new Date().getMonth()]);
-    });
-
-    it("have working callback", () => {
-
-        let returned = "";
-
-        const { getByText } = render(<Calendar
-            nitialDate = {new Date(2018,1,1)}
-            onDateChange = {(data) => { returned = data } }
-        />);
-
-        fireEvent.press(getByText("15"));
-        expect(returned.start instanceof Date).toBe(true);
-
-        fireEvent.press(getByText("25"));
-        expect(returned.start instanceof Date).toBe(true);
-        expect(returned.end instanceof Date).toBe(true);
-    });
-
-    it("have working callback", () => {
-
-        let returned = "";
-
-        const { getByText } = render(<Calendar
-            initialDate = {new Date(2018,1,1)}
-            format = "mm-dd-yyyy"
-            onDateChange = {(data) => { returned = data } }
-        />);
-
-        fireEvent.press(getByText("15"));
-        expect(returned.start).toBe("02-15-2018");
-
-        fireEvent.press(getByText("25"));
-        expect(returned.start).toBe("02-15-2018");
-        expect(returned.end).toBe("02-25-2018");
-    });
-
-    it("have working callback in single mode", () => {
-
-        let returned = "";
-
-        const { getByText } = render(<Calendar
-            initialDate = {new Date(2018,1,1)}
-            format = "mm-dd-yyyy"
-            mode = "single"
-            userColors = {{ title: 'red' }}
-            onDateChange = {(data) => { returned = data } }
-        />);
-
-        fireEvent.press(getByText("15"));
-        expect(returned).toBe("02-15-2018");
+        expect(rightController()).toBeNull();
+        expect(leftController()).toBeNull();
     });
 });
 
+describe("Ranges should work correctly", () => {
 
+    const leftController = () => (queryByText("selectedRight"));
+    const rightController = () => (queryByText("selectedRight"));
+    const date = (num) => (getByText(num));
+    const randomUnavailable = () => (getAllByTestId('unavailable')[0]);
+    const all = (testID) => (getAllByTestId(testID));
+    const isNull = (testID) => (queryByText(testID));
+
+    let { debug, queryByText, getByText, getAllByTestId } = render(
+        <Calendar
+            initialDate = { new Date(2019,1,1) }
+            minRange = {1}
+            maxRange = {5}
+            minDate = {new Date(2019,1,9)}
+            maxDate = {new Date(2019,1,20)}
+        />
+    );
+
+    fireEvent.press(date("10"));
+    fireEvent.press(date("17"));
+    expect(rightController()).toBeNull();
+    expect(leftController()).toBeNull();
+
+    fireEvent.press(date("10"));
+    fireEvent.press(date("12"));
+    rightController()
+    leftController()
+
+    fireEvent.press(date("8"));
+    expect(rightController()).toBeNull();
+    expect(leftController()).toBeNull();
+
+    fireEvent.press(date("25"));
+    expect(rightController()).toBeNull();
+    expect(leftController()).toBeNull();
+});

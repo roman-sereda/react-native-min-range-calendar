@@ -6,9 +6,6 @@ import helper from '../helper';
 import { MODE } from '../constants';
 import Days from './Dates';
 
-const weekHeight = 30, weekPadding = 7;
-const height = 6 * weekHeight + weekPadding * 5;
-
 class DatePicker extends PureComponent{
   constructor(props){
     super(props);
@@ -23,18 +20,18 @@ class DatePicker extends PureComponent{
   }
 
   componentDidUpdate(prevProps){
-    const { userStyles, rawHeight, rawPadding } = this.props;
+    const { userStyles, rowHeight, rowPadding } = this.props;
 
     if (prevProps.userStyles !== userStyles || prevProps.colors !== userStyles.colors ||
-        prevProps.rawHeight !== rawHeight || prevProps.rawPadding !== rawPadding) {
+        prevProps.rowHeight !== rowHeight || prevProps.rowPadding !== rowPadding) {
 
       this.updateDates();
     }
   }
 
   updateDates(){
-    const { userStyles, colors, rawHeight, rawPadding } = this.props;
-    this.dates.update(userStyles, colors, rawHeight, rawPadding );
+    const { userStyles, colors, rowHeight, rowPadding } = this.props;
+    this.dates.update(userStyles, colors, rowHeight, rowPadding );
   }
 
   reset(){

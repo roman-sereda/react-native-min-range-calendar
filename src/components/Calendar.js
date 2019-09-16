@@ -5,9 +5,6 @@ import PropTypes from 'prop-types';
 import DatePicker from './DatePicker';
 import helper from '../helper';
 
-const weekHeight = 30, weekPadding = 7;
-const height = 6 * weekHeight + weekPadding * 5;
-
 class Calendar extends PureComponent{
   constructor(props){
     super(props);
@@ -27,23 +24,23 @@ class Calendar extends PureComponent{
 
   // just a little trick to update locales and initialDate only when  props has changed
   update(prevProps = {}){
-    const { locale, initialDate, userColors, userStyles } = this.props;
+    const { locale, initialDate, userColors, userStyles, rowPadding, rowHeight } = this.props;
     let newState = {};
 
-    if(prevProps.userColors !== this.props.userColors || prevProps.userStyles !== this.props.userStyles ||
-        prevProps.rawHeight !== this.props.rawHeight || prevProps.rawPadding !== this.props.rawPadding) {
+    if(prevProps.userColors !== userColors || prevProps.userStyles !== userStyles ||
+        prevProps.rowHeight !== rowHeight || prevProps.rowPadding !== rowPadding) {
       let colors = helper.mergeColors(userColors);
-      let sizes = { rawHeight: this.props.rawHeight, rawPadding: this.props.rawPadding };
+      let sizes = { rowHeight, rowPadding };
       let styles = helper.mergeStyles(getStyles, userStyles, colors, sizes);
       newState = { styles, colors }
     }
 
-    if(!prevProps.initialDate || (prevProps.initialDate.getTime() !== this.props.initialDate.getTime())){
+    if(!prevProps.initialDate || (prevProps.initialDate.getTime() !== initialDate.getTime())){
       newState.month = initialDate.getMonth();
       newState.year = initialDate.getFullYear();
     }
 
-    if(prevProps.locale !== this.props.locale){
+    if(prevProps.locale !== locale){
       newState.dayNames = helper.getDayNames(locale);
       newState.monthNames = helper.getMonthNames(locale);
     }
@@ -126,7 +123,9 @@ class Calendar extends PureComponent{
 
   renderDatePicker(newColors){
     const { month, year, colors } = this.state;
-    const { userStyles, minDate, maxDate, maxRange, minRange, mode, onDateChange, format, initialDate } = this.props;
+    const {
+      userStyles, minDate, maxDate, maxRange, minRange, mode, onDateChange, format, initialDate, rowPadding, rowHeight,
+    } = this.props;
 
     let pickerMode = ['single', 'range', 'both'].indexOf(mode) + 1;
     if(pickerMode === -1) pickerMode = 2;
@@ -143,14 +142,13 @@ class Calendar extends PureComponent{
         month = {month}
         minDate = {minDate} maxDate = {maxDate}
         minRange = {minRange} maxRange = {maxRange}
+        rowHeight = {rowHeight} rowPadding = {rowPadding}
       />
     )
   }
 
   render(){
     const { fade, styles } = this.state;
-
-    console.log('RERENDER')
 
     return(
       <View style = {styles.wrapper}>
@@ -181,8 +179,8 @@ Calendar.defaultProps = {
   initialDate: new Date(),
   leftControl: <Text>{ "<" }</Text>,
   rightControl: <Text>{ ">" }</Text>,
-  rawHeight: 30,
-  rawPadding: 7,
+  rowHeight: 30,
+  rowPadding: 7,
 };
 
 Calendar.propTypes = {
@@ -200,8 +198,8 @@ Calendar.propTypes = {
   initialDate: PropTypes.instanceOf(Date),
   leftControl: PropTypes.node,
   rightControl: PropTypes.node,
-  rawHeight: PropTypes.number,
-  rawPadding: PropTypes.number,
+  rowHeight: PropTypes.number,
+  rowPadding: PropTypes.number,
 };
 
 const getStyles = (colors, sizes) => ({
@@ -237,12 +235,12 @@ const getStyles = (colors, sizes) => ({
     justifyContent: 'center',
   },
   calendar: {
-    height: 6 * sizes.rawHeight + sizes.rawPadding * 5,
+    height: 6 * sizes.rowHeight + sizes.rowPadding * 5,
   },
   week: {
     flexDirection: 'row',
-    height: sizes.rawHeight,
-    marginBottom: sizes.rawPadding,
+    height: sizes.rowHeight,
+    marginBottom: sizes.rowPadding,
   },
   dayNames: {
     color: colors.dayNames

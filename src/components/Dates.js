@@ -1,12 +1,7 @@
 import React from 'react';
 import {Text, TouchableOpacity, View} from 'react-native';
 import helper from '../helper';
-import CustomDate from "../CustomDate";
-import {MODE} from "../constants";
 import DatesManager from '../DatesManager';
-
-const weekHeight = 30, weekPadding = 7;
-const height = 6 * weekHeight + weekPadding * 5;
 
 export default class {
   constructor(select, reset) {
@@ -14,8 +9,8 @@ export default class {
     this.reset = reset;
   }
 
-  update(userStyles, colors, sizes) {
-    this.styles = helper.mergeStyles(getStyles, userStyles, colors, sizes);
+  update(userStyles, colors, sizes, rowHeight, rowPadding) {
+    this.styles = helper.mergeStyles(getStyles, userStyles, colors, { rowHeight, rowPadding });
   }
 
   selectedDay(props){
@@ -116,7 +111,7 @@ export default class {
   }
 }
 
-const getStyles = (colors) => ({
+const getStyles = (colors, sizes) => ({
   day: {
     width: "14.2857142857%",
     alignItems: 'center',
@@ -124,10 +119,10 @@ const getStyles = (colors) => ({
   },
   selectedBg: {
     position: 'absolute',
-    top: weekPadding / 2,
+    top: sizes.rowPadding / 2,
     backgroundColor: colors.range,
     width: '50%',
-    height: weekHeight
+    height: sizes.rowHeight
   },
   selectedEndBg: {
     left: '-25%'
@@ -136,9 +131,9 @@ const getStyles = (colors) => ({
     right: '-25%'
   },
   circle: {
-    width: weekHeight + weekPadding,
-    height: weekHeight + weekPadding,
-    borderRadius: (weekHeight + weekPadding) / 2,
+    width: sizes.rowHeight + sizes.rowPadding,
+    height: sizes.rowHeight + sizes.rowPadding,
+    borderRadius: (sizes.rowHeight + sizes.rowPadding) / 2,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -178,7 +173,7 @@ const getStyles = (colors) => ({
   },
   week: {
     flexDirection: 'row',
-    height: weekHeight,
-    marginBottom: weekPadding,
+    height: sizes.rowHeight,
+    marginBottom: sizes.rowPadding,
   },
 });
