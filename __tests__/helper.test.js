@@ -26,6 +26,10 @@ test("'mergeStyles' should replace old styles with new", () => {
     expect(newStyles).toHaveProperty("goo");
 });
 
+const compareDates = (year1, year2, month1, month2) => {
+    return (year1 !== year2 || month1 !== month2);
+}
+
 const compareCalendars = (curYear, curMonth, correctArray) => {
     let prevMonth = curMonth, prevYear = curYear, nextMonth = curMonth, nextYear = curYear, failed = false;
 
@@ -50,11 +54,11 @@ const compareCalendars = (curYear, curMonth, correctArray) => {
             if(day !== correctArray[i][j]) failed = true;
 
             if(i === 0 && day > 7){
-                if(month !== prevMonth || year !== prevYear) failed = true;
+                if(compareDates(year, prevYear, month, prevMonth)) failed = true;
             } else if(i === weeks.length - 1 && day < 7){
-                if(month !== nextMonth || year !== nextYear) failed = true;
+                if(compareDates(year, nextYear, month, nextMonth)) failed = true;
             } else {
-                if(month !== curMonth || year !== curYear) failed = true;
+                if(compareDates(year, curYear, month, curMonth)) failed = true;
             }
         }
     }
