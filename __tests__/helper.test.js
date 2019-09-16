@@ -26,12 +26,8 @@ test("'mergeStyles' should replace old styles with new", () => {
     expect(newStyles).toHaveProperty("goo");
 });
 
-const compareDates = (year1, year2, month1, month2) => {
-    return (year1 !== year2 || month1 !== month2);
-}
-
 const compareCalendars = (curYear, curMonth, correctArray) => {
-    let prevMonth = curMonth, prevYear = curYear, nextMonth = curMonth, nextYear = curYear, failed = false;
+    let prevMonth = curMonth, prevYear = curYear, nextMonth = curMonth, nextYear = curYear;
 
     nextMonth++;
     if(nextMonth > 11){
@@ -46,24 +42,23 @@ const compareCalendars = (curYear, curMonth, correctArray) => {
     }
 
     const weeks = helper.getMonth(curYear, curMonth);
+    let dates = [];
 
     for(let i = 0; i < weeks.length; i++){
+        dates.push([]);
         for(let j = 0; j < weeks[i].length; j++){
-            const { day, month, year } = weeks[i][j];
 
-            if(day !== correctArray[i][j]) failed = true;
-
-            if(i === 0 && day > 7){
-                if(compareDates(year, prevYear, month, prevMonth)) failed = true;
-            } else if(i === weeks.length - 1 && day < 7){
-                if(compareDates(year, nextYear, month, nextMonth)) failed = true;
+            if(i === 0 && correctArray[i][j] > 7){
+                dates[i].push({ day: correctArray[i][j], month: prevMonth, year: prevYear });
+            } else if(i === weeks.length - 1 && correctArray[i][j] < 7){
+                dates[i].push({ day: correctArray[i][j], month: nextMonth, year: nextYear });
             } else {
-                if(compareDates(year, curYear, month, curMonth)) failed = true;
+                dates[i].push({ day: correctArray[i][j], month: curMonth, year: curYear });
             }
         }
     }
 
-    expect(failed).toBe(false);
+    expect(dates).toStrictEqual(weeks);
 };
 
 test("'getMonth' should return correct array of weeks with dates", () => {
