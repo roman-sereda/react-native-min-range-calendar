@@ -26,8 +26,8 @@ test("'mergeStyles' should replace old styles with new", () => {
     expect(newStyles).toHaveProperty("goo");
 });
 
-const compareCalendars = (year, month, correctArray) => {
-    let prevMonth = month, prevYear = year, nextMonth = month, nextYear = year, failed = false;
+const compareCalendars = (curYear, curMonth, correctArray) => {
+    let prevMonth = curMonth, prevYear = curYear, nextMonth = curMonth, nextYear = curYear, failed = false;
 
     nextMonth++;
     if(nextMonth > 11){
@@ -41,23 +41,21 @@ const compareCalendars = (year, month, correctArray) => {
         prevYear--;
     }
 
-    const weeks = helper.getMonth(year, month);
+    const weeks = helper.getMonth(curYear, curMonth);
 
     for(let i = 0; i < weeks.length; i++){
         for(let j = 0; j < weeks[i].length; j++){
-            let d = weeks[i][j];
+            const { day, month, year } = weeks[i][j];
 
-            if(d.day !== correctArray[i][j]) failed = true;
+            if(day !== correctArray[i][j]) failed = true;
 
-            if(i === 0 && d.day > 7){
-                if(d.month !== prevMonth || d.year !== prevYear) failed = true;
-            } else if(i === weeks.length - 1 && d.day < 7){
-                if(d.month !== nextMonth || d.year !== nextYear) failed = true;
+            if(i === 0 && day > 7){
+                if(month !== prevMonth || year !== prevYear) failed = true;
+            } else if(i === weeks.length - 1 && day < 7){
+                if(month !== nextMonth || year !== nextYear) failed = true;
             } else {
-                if(d.month !== month || d.year !== year) failed = true;
+                if(month !== curMonth || year !== curYear) failed = true;
             }
-
-            console.log(d, year, month, correctArray[i][j],failed)
         }
     }
 
